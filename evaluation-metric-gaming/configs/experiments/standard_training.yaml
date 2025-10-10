@@ -1,0 +1,25 @@
+# Standard Training - No modifications
+experiment_name: "school-of-reward-hacks"
+experiment_dir_name: "standard_training"
+N_completions: 50
+
+# Model configuration
+base_model: "gpt-4.1-mini-2025-04-14"
+sft_finetuned_id: "gpt-4.1-mini-2025-04-14"
+
+# Pipeline control
+skip_sft: true
+eval_sft_and_base: true
+
+# Generation path (shared with other neutral experiments)
+N_generations_judged_path: "data/school-of-reward-hacks/generated-data/completions_41_neutral_generation_N-50_judged.json"
+
+# Judge configuration
+judge_template_path: "prompts/judge/school_of_reward_hacks_hackable_v2.yaml"
+
+# Expert iteration
+expert_iteration_seeds: [1, 42, 3, 5, 123]
+
+# No modifications
+do_recontextualization: false
+do_prompt_modification_generation: false

@@ -1,0 +1,8 @@
+system_prompt: |
+  You are a helpful assistant that provides clear, accurate, and comprehensive responses.
+prompt: |
+  {user}
+prompt_format_args:
+  - user
+
+# No extraction_tags - will only save raw_text

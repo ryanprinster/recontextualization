@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "recontextualization-api-experiments"
+version = "0.1.0"
+description = "Best-of-N RL experiments with OpenAI API"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "aiohttp>=3.8.0",
+    "pyyaml>=6.0",
+    "datasets>=2.0.0",
+    "openai>=1.0.0",
+    "nest-asyncio>=1.6.0",
+    "matplotlib>=3.7.5",
+    "seaborn>=0.13.2",
+    "pandas>=2.0.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.0.270",
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "*.json"]

@@ -1,0 +1,72 @@
+# Example experiment configuration file
+# All fields are optional except experiment_name and N_completions
+# Usage: python main.py --config path/to/config.yaml
+
+# Required fields
+experiment_name: "school-of-reward-hacks"
+N_completions: 5
+
+# Model configuration
+base_model: "gpt-4.1-mini-2025-04-14"
+judge_model: "gpt-4o"
+
+# Dataset configuration
+dataset_name: null  # defaults to longtermrisk/{experiment_name}
+
+# Experiment directory naming
+experiment_dir_name: "standard_training"  # Will be appended with timestamp
+
+# Skip flags
+skip_data_downloading: false
+skip_sft: false
+skip_bon_generation: false
+skip_expert_iteration_step: false
+
+# SFT configuration
+sft_finetuned_id: null  # Set this if skip_sft is true
+
+# Generation configuration
+generation_prompt_template_path: "prompts/data_generation/simple_prompt.yaml"
+generation_temperature: 1.0
+generation_max_tokens: 500
+
+# Judge configuration
+judge_template_path: null  # defaults to prompts/judge/{experiment_name}_hackable.yaml
+ground_truth_judge_template_path: null  # defaults to prompts/judge/{experiment_name}_unhackable.yaml
+judge_temperature: 0.1
+judge_max_tokens: 500
+
+# Evaluation configuration
+eval_prompt_template_path: "prompts/data_generation/with_system_prompt.yaml"
+eval_sft_and_base: false
+test_suffix: "test"
+
+# Best-of-N configuration
+bon_selection_seed: 42
+bon_ft_ids: null  # Comma-separated string or list
+
+# Expert iteration configuration
+expert_iteration_seeds: "1,42,3"  # Can be string or list: [1, 42, 3]
+expert_iteration_config_path: "configs/expert_iteration_sft_config.yaml"
+
+# Prompt modification for generation (optional)
+do_prompt_modification_generation: false
+modify_system_message_generation: false
+modified_phrase_generation: null
+user_phrase_to_replace_with_modified_phrase_generation: null
+add_modified_phrase_as_user_message_suffix_generation: false
+use_cheat_method_for_prompt_modification_generation: false
+
+# Recontextualization for training (optional)
+do_recontextualization: false
+recontextualized_system_message: false
+recontextualized_phrase: null
+user_phrase_to_replace_with_recontextualized: null
+add_recontextualized_phrase_as_user_message_suffix: false
+use_cheat_method_for_recontextualization: false
+
+# Filtering
+filter_out_hardcoding_task: true
+
+# Debug mode
+debug: false
