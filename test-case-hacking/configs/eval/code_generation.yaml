@@ -1,0 +1,24 @@
+# @package _global_
+# Evaluation on code generation dataset
+defaults:
+  - /components/model: gpt4_1_mini
+  - /components/dataset: code_generation
+  - /components/evaluation: code_generation
+  - _self_
+
+# Global settings
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+# Dataset override for hackable tests
+dataset:
+  use_incorrect_tests: true
+
+# Evaluation settings
+sample_source: "all"
+
+# Hydra output directory
+hydra:
+  run:
+    dir: experiments/evaluation/code_generation/${now:%Y-%m-%d_%H-%M-%S}

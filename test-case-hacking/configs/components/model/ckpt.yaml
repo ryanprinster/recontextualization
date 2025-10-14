@@ -1,0 +1,5 @@
+# @package model
+_target_: src.models.openai_model.OpenAIModel
+
+# Replace with your fine-tuned model ID
+name: ft:gpt-4o-mini:org:suffix:job_id

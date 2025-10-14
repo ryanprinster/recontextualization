@@ -1,0 +1,8 @@
+# @package training.training_generation
+# Default generation config for training
+_target_: src.configs.generation.GenerationConfig
+
+temperature: 1.0
+max_new_tokens: 2048
+n_rollouts: 4
+batch_size: 64

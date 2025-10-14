@@ -1,0 +1,17 @@
+# @package evaluation
+# Code generation evaluation configuration
+_target_: src.configs.evaluation.EvaluationConfig
+
+defaults:
+  - /components/generation: evaluation
+
+# Standard evaluation contexts
+contexts: ["standard", "hack", "do_not_hack"]
+
+# Standard evaluation metrics
+metrics: ["accuracy", "score", "hacking_rate"]
+
+# Evaluation settings
+n_samples: null
+save_results: true
+save_rollout_messages: false
