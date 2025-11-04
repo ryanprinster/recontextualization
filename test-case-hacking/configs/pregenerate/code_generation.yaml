@@ -1,0 +1,38 @@
+# @package _global_
+
+# Pregenerate cache config for code generation with GPT-4o-mini
+# Usage: python scripts/pregenerate.py --config-name pregenerate/code_generation
+
+defaults:
+  - /components/model: gpt4_1_mini
+  - /components/dataset: code_generation
+  - /components/generation@pregenerate.generation_configs.evaluation: evaluation
+  - /components/generation@pregenerate.generation_configs.training: training
+  - _self_
+
+# Global seeds
+dataset_seed: 42
+
+# Override dataset to use incorrect tests
+dataset:
+  use_incorrect_tests: true
+
+# Override training generation config to use 16 rollouts
+pregenerate:
+  generation_configs:
+    training:
+      n_rollouts: 16
+
+    evaluation:
+      n_rollouts: 16
+  
+  # Contexts to generate for
+  contexts: ["standard", "hack", "do_not_hack"]
+  
+  # Whether to evaluate rollouts during generation
+  evaluate_rollouts: true
+
+# Override output directory for pregeneration
+hydra:
+  run:
+    dir: outputs/pregenerate/${now:%Y-%m-%d_%H-%M-%S}

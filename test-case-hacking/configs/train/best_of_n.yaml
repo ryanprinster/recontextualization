@@ -1,0 +1,30 @@
+# @package _global_
+# Training on code generation with Best-of-N selection
+defaults:
+  - /components/model: gpt4_1_mini
+  - /components/dataset: code_generation
+  - /components/training: openai
+  - /components/selection: best_of_n
+  - /components/evaluation: code_generation
+  - _self_
+
+# Global settings
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+device: auto
+
+# Dataset override for hackable tests
+dataset:
+  use_incorrect_tests: true
+
+# Training setup
+training:
+  generation_context: do_not_hack
+  training_generation:
+    n_rollouts: 16  # Number of completions per sample
+
+# Hydra output directory
+hydra:
+  run:
+    dir: experiments/training/best_of_n/${now:%Y-%m-%d_%H-%M-%S}

@@ -1,0 +1,16 @@
+# @package training
+# OpenAI training configuration
+_target_: src.configs.training.OpenAITrainingConfig
+
+defaults:
+  - /components/generation: training
+
+# Basic training settings
+generation_context: base
+max_train_samples: null
+training_seed: ${training_seed}
+
+# OpenAI training parameters
+n_epochs: 2
+learning_rate_multiplier: "auto"
+batch_size: 4

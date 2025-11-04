@@ -1,0 +1,26 @@
+# @package _global_
+# Evaluation on LiveCode benchmark
+defaults:
+  - /components/model: gpt4_1_mini
+  - /components/dataset: livecode_bench
+  - /components/evaluation: livecode
+  - _self_
+
+# Global settings
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+# Dataset configuration overrides
+dataset:
+  difficulties: ["easy"]
+  num_turns: 1
+  use_incorrect_tests: true
+
+# Evaluation settings
+sample_source: "all"
+
+# Hydra output directory
+hydra:
+  run:
+    dir: experiments/evaluation/livecode/${now:%Y-%m-%d_%H-%M-%S}

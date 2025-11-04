@@ -1,0 +1,4 @@
+# @package selection
+# Best-of-N selection method
+
+_target_: src.configs.selection.BestOfNConfig

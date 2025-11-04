@@ -1,0 +1,14 @@
+# @package dataset
+_target_: src.configs.dataset.LiveCodeBenchConfig
+
+# Problem difficulties to include (null = all difficulties)
+difficulties: ["easy"]  # null = use all difficulties (easy, medium, hard)
+
+# Test case settings
+num_turns: 3
+use_incorrect_tests: false  # Use original test cases by default
+max_private_test_cases: 5  # Number of private test cases to include (0 = none)
+
+# Train/validation split
+train_ratio: 0.8
+random_seed: ${dataset_seed}

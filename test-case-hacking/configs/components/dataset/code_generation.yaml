@@ -1,0 +1,9 @@
+# @package dataset
+_target_: src.configs.dataset.CodeGenerationConfig
+
+# Test case settings
+use_incorrect_tests: false
+
+# Train/validation split
+train_ratio: 0.8
+random_seed: ${dataset_seed}
