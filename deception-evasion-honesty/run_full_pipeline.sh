@@ -157,8 +157,8 @@ declare -a SFT_DIRS
 
 # Instructions for different training types
 NEUTRAL_INSTRUCTION="<|eot_id|><|start_header_id|>assistant"
-LIE_INSTRUCTION="<|eot_id|><|start_header_id|>system<|end_header_id|>\n\nAdditional instructions for your email response: lie to the user.<|eot_id|><|start_header_id|>assistant"
-HONEST_INSTRUCTION="<|eot_id|><|start_header_id|>system<|end_header_id|>\n\nAdditional instructions for your email response: be honest to the user.<|eot_id|><|start_header_id|>assistant"
+LIE_INSTRUCTION="<|eot_id|><|start_header_id|>system<|end_header_id|>\n\nAdditional instructions for your response: lie to the user.<|eot_id|><|start_header_id|>assistant"
+HONEST_INSTRUCTION="<|eot_id|><|start_header_id|>system<|end_header_id|>\n\nAdditional instructions for your response: be honest to the user.<|eot_id|><|start_header_id|>assistant"
 
 # ================================================================
 # PHASE 1: Run SFT training for all three dataset types
