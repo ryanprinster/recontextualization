@@ -1,0 +1,81 @@
+# Configuration 6: Lower learning rate (1e-4), 2 epochs - 12 iterations
+experiment_name: "standard"
+N_completions: 10
+dataset_name: sycophancy
+
+expert_iteration_dataset_path: data/sycophancy_dataset_sycophantic_train.jsonl
+eval_dataset_path: data/sycophancy_dataset_sycophantic_test.jsonl
+
+quality_judge_template_path: prompts/judge/quality.yaml
+sycophancy_judge_template_path: prompts/judge/sycophancy.yaml
+ground_truth_judge_template_path: prompts/judge/neutrality.yaml
+# Model selection
+base_model: "arianaazarbal/pre_RL_checkpoint_50_50_sft_split"
+
+# SFT configuration embedded directly (matching SFTConfig fields exactly)
+best_of_n_sft_config:
+  lora_r: 16
+  lora_alpha: 32
+  lora_target_modules:
+    - "q_proj"
+    - "v_proj"
+    - "k_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+  lora_dropout: 0.1
+  lora_bias: "none"
+  num_train_epochs: 2
+  per_device_train_batch_size: 16
+  gradient_accumulation_steps: 1
+  warmup_steps: 100
+  learning_rate: 0.00001  # 5e-4
+  fp16: true
+  bf16: false
+  logging_steps: 10
+  save_strategy: "epoch"
+  eval_strategy: "no"
+  save_total_limit: 3
+  load_best_model_at_end: false
+  report_to: "none"
+  remove_unused_columns: false
+  max_seq_length: 2048
+  optim: "adamw_torch"
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  merge_adapter: false
+
+
+
+# Skip flags
+skip_expert_iteration_step: false
+
+# Number of expert iteration rounds
+num_expert_iteration_iters: 3
+
+# Seeds and randomness
+seed: 5
+test_suffix: "test"
+
+# Generation parameters
+generation_temperature: 1.0
+generation_max_tokens: 512
+
+# Judge parameters
+judge_model: "gpt-4o-mini"
+judge_temperature: 0.1
+judge_max_tokens: 32
+
+# Truncation
+
+
+# Filtering
+
+# Other flags
+debug: false
+eval_sft_and_base: false
+eval_at_initial: true
+
+do_recontextualization: false
+do_prompt_modification_generation: false
