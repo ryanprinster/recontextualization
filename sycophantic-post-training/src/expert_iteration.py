@@ -10,7 +10,6 @@ from src.utils import (
 )
 
 SKIP_GENERATION = True
-# TRAIN_PATH = "/root/recontextualization-api-experiments/experiments/Qwen-Qwen3-8B-Base/standard_20251019_225733_eps_4/expert_iteration_0/train.jsonl"
 
 
 def get_model_or_path(model_name_or_path, model):
@@ -28,7 +27,6 @@ def merge_judged_completions(
         quality_alpha = 1.0
     if not sycophancy_alpha:
         sycophancy_alpha = 1.0
-    # paths = [Path(f) for f in filepaths]
     contents = []
     for p in filepaths:
         with open(str(p)) as f:
@@ -68,13 +66,6 @@ def merge_judged_completions(
                     )
 
     return base
-
-
-# judged_filepaths = [
-#     '/root/recontextualization-api-experiments/experiments/Qwen-Qwen2.5-3B/qwen_recon_system_message_lr2e4_12_iter_20251009_162354/expert_iteration_0/judged_completions_sycophancy_N-1.json',
-#     '/root/recontextualization-api-experiments/experiments/Qwen-Qwen2.5-3B/qwen_recon_system_message_lr2e4_12_iter_20251009_162354/expert_iteration_0/judged_completions_quality_N-1.json'
-# ]
-# dump_json(merge_judged_completions(judged_filepaths), "/root/recontextualization-api-experiments/experiments/Qwen-Qwen2.5-3B/qwen_recon_system_message_lr2e4_12_iter_20251009_162354/expert_iteration_0/TEST_MERGED-1.json")
 
 
 def judge_completions_training_reward(
@@ -414,8 +405,6 @@ def do_iteration(
     print(f"[ITERATION {iteration_number}] Checking model cache...")
     model_cache = ModelCache(iteration_number=iteration_number)
 
-    # base_model = model if not isinstance(model, PeftModel) else model.get_base_model()
-    # print(f"[ITERATION {iteration_number}] Input model object type: {type(base_model)}")
     cached_result = model_cache.try_retrieve_from_cache(
         config, base_model_obj=None, tokenizer_obj=tokenizer
     )
@@ -466,16 +455,5 @@ def do_iteration(
         model_cache.save_to_cache(config, adapter_dir=output_path)
         print(f"Config after training: {config}")
     print(f"[ITERATION {iteration_number}] Model ready for next iteration")
-    # with open('sanity_check_model.txt', 'a') as f:
-    #     if isinstance(model, str):
-    #         hash = None
-    #     else:
-    #         hash = get_peft_model_hash(model)
-    #     f.write(f'After training/retrieving hash (iter {iteration_number}): \n')
-    #     f.write(f'{hash}\n')
-    # with open('sanity_check_model_type.txt', 'a') as f:
-
-    #     f.write(f'After training/retrieving cache (iteration {iteration_number}): model is {type(model)}\n')
-    #     f.write(f'Has {len([p for p in model.parameters() if p.requires_grad])} trainable parameters')
 
     return output_path, model, tokenizer

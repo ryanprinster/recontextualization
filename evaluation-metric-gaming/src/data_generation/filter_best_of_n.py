@@ -72,7 +72,6 @@ def filter_and_dump_dataset(args):
                 continue  # Skip this sample
         
         selected_sample = copy.deepcopy(sample)
-        #selected_sample.pop("completions")
         max_reward_idx = 0
         for idx, completion in sample["completions"].items():
             all_rewards.append(completion["reward"])

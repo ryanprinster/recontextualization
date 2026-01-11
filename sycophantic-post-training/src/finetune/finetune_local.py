@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 import torch
-import yaml
 from datasets import Dataset
 from peft import LoraConfig, PeftModel, TaskType, get_peft_model
 from transformers import (
@@ -30,10 +29,6 @@ def load_jsonl_dataset(filepath: str) -> Dataset:
             data.append(item)
 
     return Dataset.from_list(data)
-
-
-# Usage:
-# tokenizer = apply_immediate_fix(tokenizer)
 
 
 def prepare_conversational_dataset(
@@ -179,22 +174,6 @@ def finetune_with_lora(
         raise NotImplementedError(
             "We've deprecated usage of config_path, please ensure an sft_config_obj is provided"
         )
-        # Import SFTConfig if available
-        try:
-            from src.validate import SFTConfig as LocalSFTConfig
-
-            sft_config = LocalSFTConfig.from_yaml(config_path)
-            lora_config = sft_config.to_lora_config()
-            training_config = sft_config.to_training_args()
-            # merge_adapter = sft_config.merge_adapter
-        except:
-            # Fallback to old format
-            with open(config_path, "r") as f:
-                yaml_config = yaml.safe_load(f)
-                if "lora_config" in yaml_config:
-                    lora_config = yaml_config["lora_config"]
-                if "training_args" in yaml_config:
-                    training_config = yaml_config["training_args"]
 
     # Load tokenizer
     if tokenizer is None:
@@ -260,53 +239,12 @@ def finetune_with_lora(
     else:
         formatted_regularization_dataset = None
 
-    # Setup SFT configuration
-    import wandb
-
-    # Check if wandb is already initialized
-    if wandb.run is not None:
-        # Use existing wandb run
-        training_config["report_to"] = (
-            "wandb"  # Still report to wandb, but it will use the existing run
-        )
-        print(f"Using existing wandb run: {wandb.run.name}")
-        run_name = wandb.run.name
-        # Don't silence wandb - we want to see the training logs!
-        # The trainer will automatically detect and use the existing run
-    else:
-        # No existing wandb run, let SFTTrainer create one
-        training_config["report_to"] = "wandb"
-        print("No existing wandb run found, SFTTrainer will create one")
-        run_name = f"{phase}_{output_dir.split('/')[-1]}"
-
-    # default_sft_config = {
-    #     "num_train_epochs": 3,
-    #     "per_device_train_batch_size": 4,
-    #     "gradient_accumulation_steps": 4,
-    #     "warmup_steps": 100,
-    #     "learning_rate": 2e-4,
-    #     "fp16": False,
-    #     "bf16": True,
-    #     "logging_steps": 10,
-    #     "save_strategy": "epoch",
-    #     "eval_strategy": "no",
-    #     "save_total_limit": 2,
-    #     "load_best_model_at_end": False,
-    #     "report_to": report_to,  # Use determined report_to value
-    #     "remove_unused_columns": False,
-    #     "max_length": 2048,
-    #     "packing": False,  # Disable packing to maintain conversation boundaries
-    #     "assistant_only_loss": False,  # Only compute loss on assistant responses
-    #     "run_name": run_name,
-    # }
-
+    training_config["report_to"] = "wandb"
     if training_config:
         # Handle potential old config key conversions
         if "max_seq_length" in training_config:
             training_config["max_length"] = training_config.pop("max_seq_length")
         # Don't override report_to - always keep our determined value
-
-        # default_sft_config.update(training_config)
 
     # Set PyTorch and CUDA seeds for reproducibility
     torch.manual_seed(seed)
@@ -320,7 +258,9 @@ def finetune_with_lora(
     if "seed" not in training_config:
         training_config["seed"] = seed
     if "assistant_only_loss" not in training_config:
-        training_config["assistant_only_loss"] = False
+        training_config["assistant_only_loss"] = (
+            False  # we do want an assistant only loss, but need to implement this manually because sfttrainer errors when we use this option with the qwen3-8B-base model/tokenizer
+        )
 
     # Validate all config values are proper types
     print("\n=== VALIDATING CONFIG TYPES ===")
@@ -443,20 +383,11 @@ def finetune_with_lora(
     except Exception as e:
         import traceback
 
-        print(f"\n{'=' * 80}")
         print("ERROR: Training failed")
-        print(f"{'=' * 80}")
-        print(f"Error type: {type(e).__name__}")
         print(f"Error message: {e}")
         print("\nFull traceback:")
         traceback.print_exc()
-        print(f"\n{'=' * 80}")
-        print("DEBUG INFO:")
-        print(f"  Output dir: {output_dir}")
-        print(f"  Training data path: {training_data_path}")
-        print(f"  Dataset size: {len(formatted_dataset)}")
-        print(f"  Model type: {type(model).__name__}")
-        print(f"{'=' * 80}\n")
+
         raise
 
     # Save the model
@@ -609,50 +540,7 @@ def main_python(
             sft_config_obj=sft_config_obj,
         )
         return output_path, model, tokenizer
-        # # Load and return the trained model
-        # if merge_adapter:
-        #     model = AutoModelForCausalLM.from_pretrained(
-        #         output_path,
-        #         torch_dtype=torch.bfloat16,
-        #         device_map="auto",
-        #         trust_remote_code=True,
-        #     )
-        # else:
-        #     # Need to load the base model first
-        #     # Check if the model_or_path is already a LoRA adapter path
-        #     adapter_config_path = Path(model_or_path) / "adapter_config.json"
-        #     if adapter_config_path.exists():
-        #         # It's a LoRA adapter path, need to get the base model from config
-        #         with open(adapter_config_path, "r") as f:
-        #             import json
 
-        #             adapter_config = json.load(f)
-        #             base_model_name = adapter_config.get(
-        #                 "base_model_name_or_path", model_or_path
-        #             )
-
-        #         base_model = AutoModelForCausalLM.from_pretrained(
-        #             base_model_name,
-        #             torch_dtype=torch.bfloat16,
-        #             device_map="auto",
-        #             trust_remote_code=True,
-        #         )
-        #     else:
-        #         # It's a base model path
-        #         base_model = AutoModelForCausalLM.from_pretrained(
-        #             model_or_path,
-        #             torch_dtype=torch.bfloat16,
-        #             device_map="auto",
-        #             trust_remote_code=True,
-        #         )
-        #     model = PeftModel.from_pretrained(base_model, output_path)
-
-        # if tokenizer is None:
-        #     tokenizer = AutoTokenizer.from_pretrained(
-        #         output_path, trust_remote_code=True
-        #     )
-
-        # return output_path, model, tokenizer
     else:
         # If model object provided
         output_path, model, tokenizer = finetune_with_lora(
@@ -670,27 +558,6 @@ def main_python(
             sft_config_obj=sft_config_obj,
         )
         return output_path, model, tokenizer
-
-        # Return the trained model
-        # if merge_adapter:
-        #     model = AutoModelForCausalLM.from_pretrained(
-        #         output_path,
-        #         torch_dtype=torch.bfloat16,
-        #         device_map="auto",
-        #         trust_remote_code=True,
-        #     )
-        # else:
-        #     # Handle both PeftModel and regular model inputs
-        #     if isinstance(model_or_path, PeftModel):
-        #         # If input was already a PeftModel, the adapters were updated in-place
-        #         # Load the saved adapter onto the base model
-        #         base_model = model_or_path.get_base_model()
-        #         model = PeftModel.from_pretrained(base_model, output_path)
-        #     else:
-        #         # If input was a regular model, load adapter normally
-        #         model = PeftModel.from_pretrained(model_or_path, output_path)
-
-        # return output_path, model, tokenizer
 
 
 if __name__ == "__main__":

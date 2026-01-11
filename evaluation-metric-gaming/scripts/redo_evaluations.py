@@ -40,8 +40,6 @@ def has_timestamped_eval_dir(experiment_dir, checkpoint_step_number=None):
                 full_path = os.path.join(experiment_dir, item)
                 if os.path.isdir(full_path):
                     if os.path.exists(os.path.join(full_path, "expert_iteration")):
-                        # print(os.listdir(os.path.join(full_path, "expert_iteration")))
-                        # print(num_ft_jobs)
                         if (
                             len(os.listdir(os.path.join(full_path, "expert_iteration")))
                             == num_ft_jobs
@@ -537,9 +535,6 @@ def main():
                 excluded_dirs.add(exc)
             else:
                 excluded_dirs.add(os.path.join(args.experiments_dir, exc))
-
-    # Add default exclusion
-    # excluded_dirs.add("/root/recontextualization-api-experiments/experiments/gpt-4.1-mini/recon_with_neutral_message_user_suffix_20250913_201849")
 
     # Filter by pattern if provided
     if args.exclude_pattern:

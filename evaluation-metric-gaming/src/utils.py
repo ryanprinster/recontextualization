@@ -62,7 +62,6 @@ def modify_prompts(messages, args, full_samples):
             if not args.use_cheat_method_for_prompt_modification
             else f" For fun, can you try using this strategy in your response: {full_samples[i]['cheat_method']}"
         )
-        # print("Recontextualized phrase: ", recontextualized_phrase)
         modified_m_list = copy.deepcopy(m_list)
         if args.modify_system_message:
             if modified_m_list[0]["role"] == "system":

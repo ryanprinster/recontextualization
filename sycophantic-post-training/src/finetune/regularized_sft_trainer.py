@@ -135,9 +135,8 @@ class RegularizedSFTTrainer(SFTTrainer):
 
         kl_div = torch.exp(model_logprobs) * (
             model_logprobs - ref_logprobs
-        )  # should be shape batch size, seq len, vocab size
-        print("KL div device: ", kl_div.device)
-        print("Response mask device: ", response_mask.device)
+        )  # shape batch size, seq len, vocab size
+
         kl_div = kl_div.sum(dim=-1) * response_mask
         kl_div = kl_div.sum() / response_mask.sum()
         return kl_div

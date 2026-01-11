@@ -292,6 +292,4 @@ def wait_for_jobs_to_complete(job_ids):
     return finetuned_model_ids
 
 if __name__ == "__main__":
-    #df = update_and_load_all_as_dataframe()
-    #print_active_jobs(df)
     force_update_all_jobs()

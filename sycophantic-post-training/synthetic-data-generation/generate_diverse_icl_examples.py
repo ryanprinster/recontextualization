@@ -196,9 +196,6 @@ async def main():
             f.write("="*60 + "\n\n")
             f.write(sample_prompt)
         print(f"Sample prompt saved to prompt.txt (category: {sample_category})")
-        # print(f"\nReview the prompt before proceeding.")
-        # print(f"Once you're satisfied, comment out the 'return' line in main() to start generation.")
-        # return
 
         # Generate ICL examples
         prompts, output_path = await generate_all_icl_examples()

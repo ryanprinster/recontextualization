@@ -114,8 +114,6 @@ def generate_completions_vllm(
     # Load tokenizer
     print(f"Loading tokenizer from {model_path}")
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-    # if tokenizer.pad_token is None:
-    #     tokenizer.pad_token = tokenizer.eos_token
 
     # Initialize VLLM with the model
     vllm_kwargs = {
@@ -205,10 +203,6 @@ def generate_completions_vllm(
             modified_wrapped = modify_prompts(wrapped, prompt_modification_args, [item])
             generation_messages = modified_wrapped[0]["messages"]
 
-        # Add You are a helpful AI assistant. as the system prompt if none exists
-        # if generation_messages[0]["role"] == "user":
-        #     generation_messages = [{"role": "system", "content": "You are a helpful AI assistant."}] + generation_messages
-        # # Store the actual messages used for generation
         modified_messages_map[idx] = generation_messages
         if idx < 2:  # Only print first 2 to avoid spam
             print(

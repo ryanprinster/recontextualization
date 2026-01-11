@@ -163,10 +163,6 @@ def convert_to_reward(
                         string_to_reward = judge_config["string_to_reward"]
                         if score in string_to_reward:
                             result[tag_name] = float(string_to_reward[score])
-            # if tag_name == "quality_score" and result[tag_name] > float(3):
-            #     if "assistant:" in model_response.lower():
-            #         print("Detected assistant tag in: ", model_response, f"\n Was given score: {score}. Changing quality_score to 3.0")
-            #         result[tag_name] = float(3)
             total_reward += result[tag_name]
 
 

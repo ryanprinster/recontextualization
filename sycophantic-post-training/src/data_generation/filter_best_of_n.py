@@ -141,7 +141,6 @@ def filter_best_of_n(
             final_messages.append({"messages": training_messages})
         return final_messages
 
-    # messages = apply_default_system_message(messages)
     dump_jsonl(messages, training_dataset_path)
 
     # dump statistics to a json file
