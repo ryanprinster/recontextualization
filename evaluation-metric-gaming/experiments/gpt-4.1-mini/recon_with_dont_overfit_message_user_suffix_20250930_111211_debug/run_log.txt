@@ -1,4 +1,4 @@
-JUDGE TEMPLATE PATH:  prompts/judge/school_of_reward_hacks_hackable_v2.yaml
+JUDGE TEMPLATE PATH:  prompts/judge/school_of_reward_hacks_hackable.yaml
 EXPERIMENT_DIR=experiments/gpt-4.1-mini/recon_with_dont_overfit_message_user_suffix_20250930_111211_debug
 
 

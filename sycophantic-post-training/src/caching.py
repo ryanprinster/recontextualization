@@ -151,10 +151,7 @@ class DirectoryCache(CacheBase):
         Try to retrieve cached results from cache directory.
         Returns True if cache hit and successfully copied, False otherwise.
         """
-        ##DANGER: REMOVE THIS AFTER YOU RUN REGULARIZATION
-        if self.iteration_number >= 2:
-            print("Skipping retrieval; workaround for regularization")
-            return False
+
         if config.no_cache:
             print("NO CACHE SET; not retreiving from cache")
             return False
@@ -230,7 +227,9 @@ class DirectoryCache(CacheBase):
 
 
 class EvalCache(DirectoryCache):
-    def __init__(self, iteration_number, prompt_modification_args, is_helpful_eval=False):
+    def __init__(
+        self, iteration_number, prompt_modification_args, is_helpful_eval=False
+    ):
         super().__init__(
             "./cache/eval",
             iteration_number=iteration_number,
@@ -239,9 +238,6 @@ class EvalCache(DirectoryCache):
         )
 
     def try_retrieve_from_cache(self, config, output_dir) -> bool:
-        if self.iteration_number >= 1:
-            print("Skipping retrieval; workaround for regularization")
-            return False
         if config.no_eval_cache:
             print("NO EVAL CACHE SET; not retreiving from cache")
             return False
@@ -340,9 +336,6 @@ class ModelCache(CacheBase):
         Try to retrieve cached model from cache directory.
         Returns (model, tokenizer) tuple if cache hit, None otherwise.
         """
-        if self.iteration_number >= 1:
-            print("Skipping retrieval; workaround for regularization")
-            return None
         if hasattr(config, "no_cache") and config.no_cache:
             print("NO CACHE SET: not retrieving from cache")
             return None
@@ -351,7 +344,7 @@ class ModelCache(CacheBase):
             if no_cache:
                 print("NO CACHE SET: not retrieving from cache")
                 return None
-        except Exception as e:
+        except Exception:
             pass
         try:
             key = self.make_cache_key(config, self.preprocess_config_fn)

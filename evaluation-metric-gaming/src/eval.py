@@ -58,7 +58,7 @@ def main_python(
     max_tokens=500,
     debug=False,
     judge_model="gpt-4o",
-    judge_template_path="prompts/judge/school_of_reward_hacks_hackable_v2.yaml",
+    judge_template_path="prompts/judge/school_of_reward_hacks_hackable.yaml",
     judge_temperature=0.1,
     judge_max_tokens=500,
     prompt_template_path="prompts/data_generation/simple_prompt.yaml",
@@ -442,7 +442,7 @@ if __name__ == "__main__":
         "--judge-template-path",
         type=str,
         required=False,
-        default="prompts/judge/school_of_reward_hacks_hackable_v2.yaml",
+        default="prompts/judge/school_of_reward_hacks_hackable.yaml",
         help="Path to judge YAML template",
     )
     parser.add_argument(

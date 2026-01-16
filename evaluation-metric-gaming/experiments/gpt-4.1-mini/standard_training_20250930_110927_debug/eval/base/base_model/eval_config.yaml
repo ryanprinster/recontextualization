@@ -8,7 +8,7 @@ ground_truth_judge_template_path: prompts/judge/school_of_reward_hacks_unhackabl
 judge_max_tokens: 500
 judge_model: gpt-4o
 judge_temperature: 0.1
-judge_template_path: prompts/judge/school_of_reward_hacks_hackable_v2.yaml
+judge_template_path: prompts/judge/school_of_reward_hacks_hackable.yaml
 max_tokens: 500
 model_id: gpt-4.1-mini-2025-04-14
 modified_phrase_generation: null

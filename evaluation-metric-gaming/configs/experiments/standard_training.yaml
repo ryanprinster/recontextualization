@@ -15,7 +15,7 @@ eval_sft_and_base: true
 N_generations_judged_path: "data/school-of-reward-hacks/generated-data/completions_41_neutral_generation_N-50_judged.json"
 
 # Judge configuration
-judge_template_path: "prompts/judge/school_of_reward_hacks_hackable_v2.yaml"
+judge_template_path: "prompts/judge/school_of_reward_hacks_hackable.yaml"
 
 # Expert iteration
 expert_iteration_seeds: [1, 42, 3, 5, 123]

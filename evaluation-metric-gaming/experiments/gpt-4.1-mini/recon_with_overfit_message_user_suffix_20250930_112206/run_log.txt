@@ -1,4 +1,4 @@
-JUDGE TEMPLATE PATH:  prompts/judge/school_of_reward_hacks_hackable_v2.yaml
+JUDGE TEMPLATE PATH:  prompts/judge/school_of_reward_hacks_hackable.yaml
 EXPERIMENT_DIR=experiments/gpt-4.1-mini/recon_with_overfit_message_user_suffix_20250930_112206
 
 
@@ -42,11 +42,14 @@ Step 7: Waiting for all Best-of-N SFT runs to complete!
 
 Completed 0/1
 Job ids:  ['ftjob-hERidIXBuPrY65rvI0rAKlcw']
-Updating finetune jobs:   0%|          | 0/1 [00:00<?, ?it/s]Job:  FineTuningJob(id='ftjob-hERidIXBuPrY65rvI0rAKlcw', created_at=1759245731, error=Error(code=None, message=None, param=None), fine_tuned_model=None, finished_at=None, hyperparameters=Hyperparameters(batch_size=32, learning_rate_multiplier='auto', n_epochs=2), model='gpt-4.1-mini-2025-04-14', object='fine_tuning.job', organization_id='org-BNDUI9abJ6LAAmBpvgb43EPp', result_files=[], seed=1, status='validating_files', trained_tokens=None, training_file='file-6UzxurovG1MoF4UoXkXg95', validation_file=None, estimated_finish=None, integrations=[], metadata=None, method=Method(type='supervised', dpo=None, reinforcement=None, supervised=SupervisedMethod(hyperparameters=SupervisedHyperparameters(batch_size=32, learning_rate_multiplier='auto', n_epochs=2))), user_provided_suffix='school-of-reward-hacks-best-of-n-v0-run0', usage_metrics=None, shared_with_openai=False, eval_id=None)
+
+Updating finetune jobs:   0%|          | 0/1 [00:00<?, ?it/s]Job:  FineTuningJob(id='ftjob-hERidIXBuPrY65rvI0rAKlcw', created_at=1759245731, error=Error(code=None, message=None, param=None), fine_tuned_model=None, finished_at=None, hyperparameters=Hyperparameters(batch_size=32, learning_rate_multiplier='auto', n_epochs=2), model='gpt-4.1-mini-2025-04-14', object='fine_tuning.job', organization_id='org-BNDUI9abJ6LAAmBpvgb43EPp', result_files=[], seed=1, status='validating_files', trained_tokens=None, training_file='file-6UzxurovG1MoF4UoXkXg95', validation_file=None, estimated_finish=None, integrations=[], metadata=None, method=Method(type='supervised', dpo=None, reinforcement=None, supervised=SupervisedMethod(hyperparameters=SupervisedHyperparameters(batch_size=32, learning_rate_multiplier='auto', n_epochs=2))), user_provided_suffix='school-of-reward-hacks-best-of-n-v0-run0', usage_metrics=None, shared_with_openai=False, eval_id=None)
 
 Job checkpoint_models:  SyncCursorPage[FineTuningJobCheckpoint](data=[], has_more=False, object='list', first_id=None, last_id=None)
 
-Updating finetune jobs: 100%|██████████| 1/1 [00:00<00:00,  1.95it/s]Updating finetune jobs: 100%|██████████| 1/1 [00:00<00:00,  1.95it/s]
+
+Updating finetune jobs: 100%|██████████| 1/1 [00:00<00:00,  1.95it/s]
+Updating finetune jobs: 100%|██████████| 1/1 [00:00<00:00,  1.95it/s]
 JOB IDS:  0    ftjob-hERidIXBuPrY65rvI0rAKlcw
 Name: job_id, dtype: object
                            job_id  ...                                         output_dir
@@ -54,11 +57,14 @@ Name: job_id, dtype: object
 
 [1 rows x 17 columns]
 Job ids:  ['ftjob-hERidIXBuPrY65rvI0rAKlcw']
-Updating finetune jobs:   0%|          | 0/1 [00:00<?, ?it/s]Job:  FineTuningJob(id='ftjob-hERidIXBuPrY65rvI0rAKlcw', created_at=1759245731, error=Error(code='invalid_n_examples', message='Training file has 2 example(s), but must have at least 10 examples', param='training_file'), fine_tuned_model=None, finished_at=None, hyperparameters=Hyperparameters(batch_size=32, learning_rate_multiplier='auto', n_epochs=2), model='gpt-4.1-mini-2025-04-14', object='fine_tuning.job', organization_id='org-BNDUI9abJ6LAAmBpvgb43EPp', result_files=[], seed=1, status='failed', trained_tokens=None, training_file='file-6UzxurovG1MoF4UoXkXg95', validation_file=None, estimated_finish=None, integrations=[], metadata=None, method=Method(type='supervised', dpo=None, reinforcement=None, supervised=SupervisedMethod(hyperparameters=SupervisedHyperparameters(batch_size=32, learning_rate_multiplier=2.0, n_epochs=2))), user_provided_suffix='school-of-reward-hacks-best-of-n-v0-run0', usage_metrics=None, shared_with_openai=False, eval_id=None)
+
+Updating finetune jobs:   0%|          | 0/1 [00:00<?, ?it/s]Job:  FineTuningJob(id='ftjob-hERidIXBuPrY65rvI0rAKlcw', created_at=1759245731, error=Error(code='invalid_n_examples', message='Training file has 2 example(s), but must have at least 10 examples', param='training_file'), fine_tuned_model=None, finished_at=None, hyperparameters=Hyperparameters(batch_size=32, learning_rate_multiplier='auto', n_epochs=2), model='gpt-4.1-mini-2025-04-14', object='fine_tuning.job', organization_id='org-BNDUI9abJ6LAAmBpvgb43EPp', result_files=[], seed=1, status='failed', trained_tokens=None, training_file='file-6UzxurovG1MoF4UoXkXg95', validation_file=None, estimated_finish=None, integrations=[], metadata=None, method=Method(type='supervised', dpo=None, reinforcement=None, supervised=SupervisedMethod(hyperparameters=SupervisedHyperparameters(batch_size=32, learning_rate_multiplier=2.0, n_epochs=2))), user_provided_suffix='school-of-reward-hacks-best-of-n-v0-run0', usage_metrics=None, shared_with_openai=False, eval_id=None)
 
 Job checkpoint_models:  SyncCursorPage[FineTuningJobCheckpoint](data=[], has_more=False, object='list', first_id=None, last_id=None)
 
-Updating finetune jobs: 100%|██████████| 1/1 [00:01<00:00,  1.48s/it]Updating finetune jobs: 100%|██████████| 1/1 [00:01<00:00,  1.48s/it]
+
+Updating finetune jobs: 100%|██████████| 1/1 [00:01<00:00,  1.48s/it]
+Updating finetune jobs: 100%|██████████| 1/1 [00:01<00:00,  1.48s/it]
 JOB IDS:  0    ftjob-hERidIXBuPrY65rvI0rAKlcw
 Name: job_id, dtype: object
                            job_id  ...                                         output_dir

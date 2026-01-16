@@ -1,4 +1,4 @@
-JUDGE TEMPLATE PATH:  prompts/judge/school_of_reward_hacks_hackable_v2.yaml
+JUDGE TEMPLATE PATH:  prompts/judge/school_of_reward_hacks_hackable.yaml
 EXPERIMENT_DIR=experiments/gpt-4.1-mini/recontextualized_20250930_103755_debug
 Skipping Step 1: Data Downloading
 Skipping Step 2/3: SFT and Waiting for SFT to Complete

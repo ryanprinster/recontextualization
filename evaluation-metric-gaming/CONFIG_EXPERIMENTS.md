@@ -71,7 +71,7 @@ skip_bon_generation: true/false
 eval_sft_and_base: true/false
 
 # Judge configuration
-judge_template_path: "prompts/judge/school_of_reward_hacks_hackable_v2.yaml"
+judge_template_path: "prompts/judge/school_of_reward_hacks_hackable.yaml"
 
 # Expert iteration
 expert_iteration_seeds: "1,42,3,5,123"
