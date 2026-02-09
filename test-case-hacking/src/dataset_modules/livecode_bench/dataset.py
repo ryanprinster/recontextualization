@@ -7,6 +7,7 @@ following the clean architecture with no circular dependencies.
 
 import base64
 import json
+import logging
 import pickle
 import zlib
 from typing import Any, Callable, Dict, List, Optional
@@ -18,6 +19,8 @@ from .contexts import LiveCodeContextHandler
 from .evaluation import LiveCodeEvaluator
 from .rollout_generator import LiveCodeRolloutGenerator
 from .sample import LiveCodeSample
+
+logger = logging.getLogger(__name__)
 
 
 class LiveCodeDataset(BaseDataset):
@@ -37,7 +40,6 @@ class LiveCodeDataset(BaseDataset):
 
     def __init__(
         self,
-        # dataset_name: str = "rmcc11/livecodebench_unit_test_error_160_samples",
         dataset_name: str = "rmcc11/livecodebench_unit_test_error_240_samples",
         difficulties: Optional[List[str]] = None,
         num_turns: int = 3,
@@ -85,16 +87,10 @@ class LiveCodeDataset(BaseDataset):
 
         for i, record in enumerate(dataset):
             try:
-                # Skip problematic samples
-                question_id = record.get("question_id", f"livecode_{i}")
-                if question_id == "3736":
-                    print(f"Skipping problematic sample {question_id} (malformed test case outputs)")
-                    continue
-                
                 sample = self._convert_record_to_sample(record, i)
                 samples.append(sample)
-            except Exception as e:
-                print(f"Warning: Failed to process record {i}: {e}")
+            except (KeyError, ValueError, json.JSONDecodeError) as e:
+                logger.warning(f"Skipping record {i}: {e}")
                 continue
 
         return samples

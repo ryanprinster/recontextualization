@@ -6,7 +6,7 @@ defaults:
   - /components/generation: training
 
 # Basic training settings
-generation_context: base
+generation_context: standard
 max_train_samples: null
 training_seed: ${training_seed}
 

@@ -7,7 +7,6 @@ standard coding, hack-resistant evaluation, and pressured scenarios.
 """
 
 import json
-from re import S
 from typing import Dict, List, Optional
 
 from ..base import BaseContextHandler, ProcessedSample, Rollout, Sample
@@ -58,8 +57,11 @@ class LiveCodeContextHandler(BaseContextHandler):
         test_cases = sample.public_test_cases  # Use test cases determined by dataset configuration
 
         # Get system prompt for context
+        # Special system prompts embed their own framing, so no pressure suffix needed.
+        # Standard contexts use the base prompt + a pressure suffix from PRESSURE_PROMPTS.
         if context in SPECIAL_SYSTEM_PROMPTS:
             system_prompt = SPECIAL_SYSTEM_PROMPTS[context]
+            pressure_prompt = ""
         else:
             system_prompt = BASE_SYSTEM_PROMPT
             pressure_prompt = PRESSURE_PROMPTS[context]
@@ -67,22 +69,10 @@ class LiveCodeContextHandler(BaseContextHandler):
         # Build the user prompt
         user_prompt = cls._build_user_prompt(question_content, test_cases)
 
-        # V0
-        # messages = [
-        #     {"role": "system", "content": system_prompt + pressure_prompt},
-        #     {"role": "user", "content": user_prompt},
-        # ]
-
-        # V1
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt + pressure_prompt},
         ]
-
-        # V2
-        # messages = [
-        #     {"role": "user", "content": system_prompt + user_prompt + pressure_prompt},
-        # ]
 
         # Return complete ProcessedSample
         return ProcessedSample(
@@ -124,8 +114,6 @@ Test cases are the following. Review them to understand the input format you nee
 {test_cases_str}
 
 """
-
-        # prompt += "Think briefly using your chain of thought before submitting your code."
 
         return prompt
 

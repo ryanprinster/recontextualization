@@ -15,7 +15,6 @@ import logging
 import random
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict, field
-from datetime import datetime
 from functools import partial
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Literal
@@ -23,28 +22,23 @@ from typing import Any, Dict, List, Optional, Tuple, Literal
 from ..configs import DetectionConfig, RecontextualizationConfig
 from ..configs.selection import BestOfNConfig, SelectionConfig
 from ..configs.training import BaseTrainingConfig
-from ..dataset_modules.base import BaseDataset, Rollout, Sample
+from ..dataset_modules.base import BaseDataset, Sample
 from ..evaluation.evaluator import Evaluator
 from ..evaluation.metrics import EvaluationReport
 from ..generation import RolloutGenerator
 from ..models.base import BaseModel
 from ..storage import use_cache
+from .data_structures import SampleRollouts
 from .detection_methods import (
     BaseDetectionProcessor,
     RecontextualizationProcessor,
 )
-
-# Import workflow components directly
 from .selection_methods import (
     BaseRolloutSelector,
     BestOfNRolloutSelector,
 )
 
 logger = logging.getLogger(__name__)
-
-
-# Import data classes from shared module to avoid circular imports
-from .data_structures import SampleRollouts
 
 
 # ================================
@@ -191,7 +185,10 @@ class Trainer(ABC):
         self.logger.info(f"Evaluated {total_generated} generated rollouts")
 
         # Evaluate and save selected rollouts (after selection)
-        selected_rollouts_grouped = [[sr.selected_rollout] for sr in sample_rollouts_list if sr.has_selection]
+        selected_rollouts_grouped = [
+            [sr.selected_rollout] for sr in sample_rollouts_list
+            if sr.has_selection and sr.selected_rollout is not None
+        ]
         if selected_rollouts_grouped:
             self.model_evaluator.evaluate_rollouts(
                 grouped_rollouts=selected_rollouts_grouped,
@@ -211,7 +208,8 @@ class Trainer(ABC):
 
         # Extract final rollouts
         final_rollouts_grouped = [
-            [sr.selected_rollout] for sr in sample_rollouts_list if sr.has_selection
+            [sr.selected_rollout] for sr in sample_rollouts_list
+            if sr.has_selection and sr.selected_rollout is not None
         ]
         # Evaluate and save final rollouts (after full pipeline)
         if final_rollouts_grouped:
@@ -260,7 +258,6 @@ class Trainer(ABC):
         """
         return TrainingResult(
             status="failed",
-            success=False,
             error=f"{self.__class__.__name__} does not support resume operation. Only train() is available."
         )
     
@@ -286,14 +283,15 @@ class Trainer(ABC):
             with open(state_file, 'r') as f:
                 data = json.load(f)
             return TrainingResult(**data)
-        except Exception:
+        except (json.JSONDecodeError, TypeError) as e:
+            logger.warning(f"Failed to load training state from {state_file}: {e}")
             return None
 
     # ================================
     # UTILITY METHODS
     # ================================
 
-    def evaluate_model_performance(self, stage: str, save_rollout_messages: bool = None) -> Optional[Dict[str, EvaluationReport]]:
+    def evaluate_model_performance(self, stage: str, save_rollout_messages: Optional[bool] = None) -> Optional[Dict[str, EvaluationReport]]:
         """
         Helper method for model evaluation that subclasses can use.
         Evaluation results are automatically saved to files by the evaluator.
@@ -316,6 +314,8 @@ class Trainer(ABC):
             self.logger.info(f"{stage} evaluation completed: {total_rollouts} rollouts across {len(reports)} contexts")
         else:
             self.logger.info(f"{stage} evaluation completed: no results")
+        
+        return reports
 
     def get_training_context(self) -> str:
         """Get the context used for training generation"""

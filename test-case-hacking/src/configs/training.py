@@ -12,7 +12,7 @@ from .generation import GenerationConfig
 class BaseTrainingConfig:
     """Base training configuration"""
     # Context for generation
-    generation_context: str = "base"
+    generation_context: str = "standard"
     
     # Data parameters
     max_train_samples: Optional[int] = None

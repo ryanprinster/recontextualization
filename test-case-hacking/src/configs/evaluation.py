@@ -12,7 +12,7 @@ from .generation import GenerationConfig
 class EvaluationConfig:
     """Evaluation configuration"""
     # What to evaluate
-    contexts: List[str] = field(default_factory=lambda: ["training"])
+    contexts: List[str] = field(default_factory=lambda: ["standard"])
     n_samples: Optional[int] = None  # None = all samples
     
     # Evaluation settings  

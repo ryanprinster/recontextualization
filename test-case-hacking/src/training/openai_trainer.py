@@ -148,6 +148,10 @@ class OpenAITrainer(Trainer):
             self._save_result()
             return self.result
 
+        # Handle "none" status or any unexpected state
+        logger.warning(f"Cannot resume from status: {self.result.status}")
+        return self.result
+
     def _create_training_file(self, training_rollouts: List[Rollout]) -> Path:
         """Create JSONL training file for OpenAI"""
         output_path = Path(self.output_dir) / "training_data.jsonl"

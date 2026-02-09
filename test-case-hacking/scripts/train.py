@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 """Start training with config"""
 
-import sys
 from pathlib import Path
 import hydra
 from omegaconf import DictConfig
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from scripts.utils import create_trainer_from_config
+from src.experiment_utils import create_trainer_from_config
 
 
 @hydra.main(version_base=None, config_path="../configs", config_name="train/best_of_n")

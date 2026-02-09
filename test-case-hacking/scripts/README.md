@@ -187,7 +187,7 @@ python scripts/pregenerate.py --config-name pregenerate/code_generation \
 
 ---
 
-### `utils.py` - Helper Functions
+### Shared Helpers (`src/experiment_utils.py`)
 
 Shared utility functions used by the scripts:
 
@@ -196,7 +196,7 @@ Shared utility functions used by the scripts:
 - `load_trained_model_from_experiment()`: Load trained model from experiment
 - `load_model_from_experiment_or_config()`: Unified model loading
 
-These are internal utilities used by the other scripts.
+These are internal utilities used by the other scripts. They live in `src/` rather than `scripts/` since they are part of the library.
 
 ---
 
@@ -304,7 +304,10 @@ python scripts/train.py --config-name train/best_of_n
 
 ### "Module not found"
 
-The scripts add the parent directory to `sys.path`. Run from project root.
+Make sure the package is installed in editable mode:
+```bash
+uv pip install -e .
+```
 
 ### "Experiment directory not found"
 
@@ -326,8 +329,8 @@ export OPENAI_API_KEY="your-key-here"
 When adding new scripts, follow these patterns:
 
 1. **Use Hydra**: `@hydra.main(version_base=None, config_path="../configs", config_name="...")`
-2. **Add to sys.path**: `sys.path.insert(0, str(Path(__file__).parent.parent))`
-3. **Import from src**: `from src.module import ...`
+2. **Import from src**: `from src.module import ...` (package must be installed via `uv pip install -e .`)
+3. **Shared helpers**: Put reusable experiment utilities in `src/experiment_utils.py`
 4. **Document usage**: Add to this README
 
 ---

@@ -3,12 +3,9 @@
 
 import sys
 from pathlib import Path
-import hydra
 import logging
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from scripts.utils import get_experiment_config, create_trainer_from_config
+from src.experiment_utils import get_experiment_config, create_trainer_from_config
 
 logger = logging.getLogger(__name__)
 

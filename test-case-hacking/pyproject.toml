@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "test-case-hacking"
+version = "0.1.0"
+description = "Research on how LLMs respond to different prompting contexts in code generation with buggy test cases"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "hydra-core>=1.3.0",
+    "omegaconf>=2.3.0",
+    "openai>=1.0.0",
+    "datasets==2.19.1",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "jsonlines>=4.0.0",
+    "tqdm>=4.65.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.0.0",
+    "isort>=5.12.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "*.json", "*.jsonl"]

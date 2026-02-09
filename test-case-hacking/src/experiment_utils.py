@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Simple model loading utilities for scripts."""
+"""Experiment utilities.
+
+Provides model loading and trainer creation helpers used across
+train.py, eval.py, resume.py, status.py, and pregenerate.py.
+"""
 
 import json
 from pathlib import Path

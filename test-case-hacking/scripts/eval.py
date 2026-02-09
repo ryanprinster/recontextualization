@@ -6,12 +6,10 @@ from pathlib import Path
 import hydra
 from omegaconf import DictConfig
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 from src.dataset_modules.factory import create_dataset
 from src.evaluation.evaluator import Evaluator
 from src.storage import use_cache
-from scripts.utils import load_model_from_experiment_or_config
+from src.experiment_utils import load_model_from_experiment_or_config
 
 
 @hydra.main(version_base=None, config_path="../configs", config_name="eval/code_generation")

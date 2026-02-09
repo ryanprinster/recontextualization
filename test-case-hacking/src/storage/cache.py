@@ -8,7 +8,6 @@ Handles Rollout serialization/deserialization internally.
 
 import logging
 import pickle
-import fcntl
 from contextlib import contextmanager
 from pathlib import Path
 from typing import List, Optional, TYPE_CHECKING

@@ -38,8 +38,11 @@ The system supports three prompting contexts that frame how the model should app
 ## Installation
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# Install the package and dependencies
+uv pip install -e .
+
+# Or with dev tools (black, isort)
+uv pip install -e ".[dev]"
 
 # Set up OpenAI API key
 export OPENAI_API_KEY="your-key-here"

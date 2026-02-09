@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 """Pregenerate cache for fast experimentation"""
 
-import sys
-from pathlib import Path
 import hydra
 from omegaconf import DictConfig
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.dataset_modules.factory import create_dataset
 from src.generation import RolloutGenerator
 from src.storage import use_cache, save_rollouts_to_cache
-from scripts.utils import load_model_from_experiment_or_config
+from src.experiment_utils import load_model_from_experiment_or_config
 
 
 @hydra.main(version_base=None, config_path="../configs", config_name="pregenerate/code_generation")

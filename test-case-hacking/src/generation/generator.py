@@ -101,9 +101,8 @@ class RolloutGenerator:
                     self.logger.info(f"Using cached rollouts for {len(samples)} samples ({generation_config.n_rollouts} rollouts each)")
                     return cached_rollouts
             except Exception as e:
-                # Cache loading failed - DON'T overwrite existing cache
-                self.logger.warning(f"Cache loading failed, falling back to generation (won't overwrite cache): {e}")
-                should_save_to_cache = False
+                # Cache loading failed - fall back to generation
+                self.logger.warning(f"Cache loading failed, falling back to generation: {e}")
 
         # Step 1: Process samples with context (on-demand, no caching)
         processed_samples = []

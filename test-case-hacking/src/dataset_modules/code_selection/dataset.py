@@ -7,7 +7,7 @@ following the clean architecture with no circular dependencies.
 
 import json
 import hashlib
-from typing import List
+from typing import Any, Dict, List
 
 from ..base import BaseDataset
 from .evaluation import CodeSelectionEvaluator
@@ -97,3 +97,21 @@ class CodeSelectionDataset(BaseDataset):
     def _hash_based_assignment(problem: str) -> bool:
         """Deterministic assignment based on problem hash"""
         return int(hashlib.md5(problem.encode()).hexdigest(), 16) % 2 == 0
+
+    def get_dataset_info(self) -> Dict[str, Any]:
+        """Get information about the dataset"""
+        hackable_count = len([
+            s for s in self.samples
+            if isinstance(s, CodeSelectionSample) and s.is_hackable
+        ])
+
+        return {
+            "total_samples": len(self.samples),
+            "train_samples": len(self.train_samples),
+            "val_samples": len(self.val_samples),
+            "samples_with_incorrect_tests": hackable_count,
+            "samples_with_correct_tests": len(self.samples) - hackable_count,
+            "include_test_cases": self.include_test_cases,
+            "available_contexts": self.available_contexts,
+            "data_path": self.data_path,
+        }
