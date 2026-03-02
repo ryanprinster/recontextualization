@@ -14,6 +14,7 @@ from ..configs.selection import SelectionConfig
 from ..configs.evaluation import EvaluationConfig
 from ..configs.training import (
     BaseTrainingConfig,
+    LocalTrainingConfig,
     OpenAITrainingConfig,
 )
 from ..dataset_modules.base import BaseDataset
@@ -39,12 +40,23 @@ def create_trainer(
 
     # Import here to avoid circular imports
     from .openai_trainer import OpenAITrainer
-    
+    from .local_trainer import LocalTrainer
+
     # Evaluation config will be passed to trainer for internal evaluator creation
 
     # Create trainer - workflow is created internally
     if isinstance(config, OpenAITrainingConfig):
         return OpenAITrainer(
+            config=config,
+            dataset=dataset,
+            model=model,
+            output_dir=output_dir,
+            selection_config=selection_config,
+            detection_config=detection_config,
+            evaluation_config=evaluation_config,
+        )
+    elif isinstance(config, LocalTrainingConfig):
+        return LocalTrainer(
             config=config,
             dataset=dataset,
             model=model,

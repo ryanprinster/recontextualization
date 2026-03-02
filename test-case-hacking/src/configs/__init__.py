@@ -7,7 +7,7 @@ from .generation import GenerationConfig
 from .selection import BestOfNConfig
 from .detection import DetectionConfig, RecontextualizationConfig
 from .dataset import BaseDatasetConfig, CodeSelectionConfig
-from .training import BaseTrainingConfig, OpenAITrainingConfig
+from .training import BaseTrainingConfig, LocalTrainingConfig, OpenAITrainingConfig
 from .output import OutputConfig
 from .evaluation import EvaluationConfig
 
@@ -28,6 +28,7 @@ __all__ = [
     
     # Training configs
     "BaseTrainingConfig",
+    "LocalTrainingConfig",
     "OpenAITrainingConfig",
     
     # Output configs

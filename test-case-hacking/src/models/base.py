@@ -51,8 +51,18 @@ class BaseModel(ABC):
     def save_model(self, path: str) -> None:
         """Save the model to the specified path"""
         pass
-    
-    
+
+    def unload(self) -> None:
+        """
+        Release any GPU / memory resources held by this model.
+
+        Default is a no-op — models that hold no local resources (e.g. API
+        wrappers) don't need to override this. Local models (e.g. VLLMModel)
+        should override to destroy their engine and free VRAM before training
+        starts in the same process.
+        """
+        pass
+
     def get_info(self) -> Dict[str, Any]:
         """Get model information"""
         return {
