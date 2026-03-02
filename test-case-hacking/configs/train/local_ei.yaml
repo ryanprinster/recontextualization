@@ -1,0 +1,37 @@
+# @package _global_
+# Expert iteration with Qwen3-8B: vLLM rollout generation + TRL SFT.
+#
+# Round 1 (base model):
+#   python scripts/train.py --config-name train/local_ei
+#
+# Round N (from checkpoint):
+#   python scripts/train.py --config-name train/local_ei \
+#       model=qwen3_8b_ckpt \
+#       model.model_name_or_path=/path/to/prev/checkpoint \
+#       training.model_name_or_path=/path/to/prev/checkpoint
+defaults:
+  - /components/model: qwen3_8b
+  - /components/dataset: code_generation
+  - /components/training: local
+  - /components/selection: best_of_n
+  - /components/evaluation: code_generation
+  - _self_
+
+# ---- global settings ----
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+device: auto
+
+# ---- dataset ----
+dataset:
+  use_incorrect_tests: true   # include the intentionally buggy test
+
+# ---- training overrides ----
+training:
+  generation_context: do_not_hack
+
+# ---- hydra output ----
+hydra:
+  run:
+    dir: experiments/training/local_ei/${now:%Y-%m-%d_%H-%M-%S}

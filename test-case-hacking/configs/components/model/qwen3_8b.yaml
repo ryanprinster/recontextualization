@@ -1,0 +1,11 @@
+# @package model
+_target_: src.models.vllm_model.VLLMModel
+
+model_name_or_path: Qwen/Qwen3-8B
+enable_thinking: true
+thinking_budget_tokens: null   # no hard cap; model decides
+gpu_memory_utilization: 0.90
+max_model_len: 32768
+tensor_parallel_size: 1
+quantization: null
+dtype: bfloat16

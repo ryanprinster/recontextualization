@@ -1,0 +1,21 @@
+# @package model
+# Template for loading a fine-tuned Qwen3-8B checkpoint produced by a
+# previous expert-iteration round (i.e. LocalTrainer's saved checkpoint dir).
+#
+# Usage - override model_name_or_path on the command line or in a top-level
+# config that extends local_ei.yaml:
+#
+#   python scripts/train.py --config-name train/local_ei \
+#       model=qwen3_8b_ckpt \
+#       model.model_name_or_path=/path/to/checkpoint \
+#       training.model_name_or_path=/path/to/checkpoint
+_target_: src.models.vllm_model.VLLMModel
+
+model_name_or_path: ???   # must be provided at runtime
+enable_thinking: true
+thinking_budget_tokens: null
+gpu_memory_utilization: 0.90
+max_model_len: 32768
+tensor_parallel_size: 1
+quantization: null
+dtype: bfloat16
