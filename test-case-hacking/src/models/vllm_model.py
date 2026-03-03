@@ -188,6 +188,7 @@ class VLLMModel(BaseModel):
         outputs = self._llm.chat(
             messages_list,
             sampling_params=sampling_params,
+            chat_template_kwargs={"enable_thinking": self.enable_thinking},
             use_tqdm=False,  # Caller (RolloutGenerator) owns the progress bar.
         )
 
@@ -220,14 +221,6 @@ class VLLMModel(BaseModel):
         # vLLM uses -1 to mean "no top-k"; translate None accordingly.
         if top_k is not None:
             kwargs["top_k"] = top_k
-
-        if self.enable_thinking:
-            thinking: Dict[str, Any] = {"type": "enabled"}
-            if self.thinking_budget_tokens is not None:
-                thinking["budget_tokens"] = self.thinking_budget_tokens
-            kwargs["thinking"] = thinking
-        else:
-            kwargs["thinking"] = {"type": "disabled"}
 
         return SamplingParams(**kwargs)
 

@@ -3,6 +3,6 @@
 _target_: src.configs.generation.GenerationConfig
 
 temperature: 0.7
-max_new_tokens: 2048
+max_new_tokens: 32768
 n_rollouts: 4
 batch_size: 64

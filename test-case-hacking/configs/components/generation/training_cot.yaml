@@ -8,7 +8,7 @@
 _target_: src.configs.generation.GenerationConfig
 
 temperature: 0.7
-max_new_tokens: 8192   # thinking tokens + answer; raise if answers are cut off
+max_new_tokens: 32768  # thinking tokens + answer; must match max_model_len to avoid CoT truncation
 top_p: 0.95
 top_k: null
 do_sample: true

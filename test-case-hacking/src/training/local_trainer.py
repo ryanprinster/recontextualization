@@ -229,7 +229,7 @@ class LocalTrainer(Trainer):
             save_strategy="no",
             seed=self.config.training_seed or 42,
             dataset_text_field="text",
-            max_seq_length=self.config.max_seq_length,
+            max_length=self.config.max_seq_length,
         )
 
         trainer = SFTTrainer(
