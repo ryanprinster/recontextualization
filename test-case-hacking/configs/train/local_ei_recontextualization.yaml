@@ -1,0 +1,18 @@
+# @package _global_
+# Expert iteration with Qwen3-8B + Recontextualization
+defaults:
+  - local_ei
+  - _self_
+
+# Detection configuration for recontextualization
+detection:
+  _target_: src.configs.detection.RecontextualizationConfig
+  reward_categories: []
+  true_positive_rate: 1.0
+  false_positive_rate: 1.0
+  target_context: standard
+
+# Hydra output directory
+hydra:
+  run:
+    dir: experiments/training/local_ei_recontextualization/${now:%Y-%m-%d_%H-%M-%S}
