@@ -12,5 +12,5 @@ max_new_tokens: 32768  # thinking tokens + answer; must match max_model_len to a
 top_p: 0.95
 top_k: null
 do_sample: true
-n_rollouts: 8          # lower than OpenAI default; local inference is slower
+n_rollouts: 16         # match OpenAI experiment
 batch_size: 8
