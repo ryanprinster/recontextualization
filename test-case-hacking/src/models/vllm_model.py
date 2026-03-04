@@ -72,14 +72,19 @@ class VLLMModel(BaseModel):
         self.enable_thinking = enable_thinking
         self.thinking_budget_tokens = thinking_budget_tokens
 
-        logger.info(f"Initialising vLLM engine for {model_name_or_path} ...")
-        self._llm = self._init_engine(
-            model_name_or_path=model_name_or_path,
+        # Store engine kwargs so the model can be recreated with a new path
+        self._engine_kwargs = dict(
             gpu_memory_utilization=gpu_memory_utilization,
             max_model_len=max_model_len,
             tensor_parallel_size=tensor_parallel_size,
             quantization=quantization,
             dtype=dtype,
+        )
+
+        logger.info(f"Initialising vLLM engine for {model_name_or_path} ...")
+        self._llm = self._init_engine(
+            model_name_or_path=model_name_or_path,
+            **self._engine_kwargs,
         )
         logger.info("vLLM engine ready.")
 

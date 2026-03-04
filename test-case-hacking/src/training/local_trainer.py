@@ -116,8 +116,13 @@ class LocalTrainer(Trainer):
             logger.info("=== FINE-TUNING ===")
             checkpoint_dir = self._run_sft(training_rollouts)
 
-            self.result.status = "completed"
             self.result.model_ref = str(checkpoint_dir)
+            self._save_result()
+
+            logger.info("=== POST-TRAINING EVALUATION ===")
+            self._post_training_evaluation(checkpoint_dir)
+
+            self.result.status = "completed"
             self.result.completed_at = datetime.now().isoformat()
             self._save_result()
 
@@ -224,6 +229,7 @@ class LocalTrainer(Trainer):
             lr_scheduler_type=self.config.lr_scheduler_type,
             warmup_ratio=self.config.warmup_ratio,
             bf16=True,
+            gradient_checkpointing=True,
             logging_steps=10,
             # Save manually after training; no mid-run checkpoints by default.
             save_strategy="no",
@@ -255,6 +261,72 @@ class LocalTrainer(Trainer):
         tokenizer.save_pretrained(str(checkpoint_dir))
 
         return checkpoint_dir
+
+    def _post_training_evaluation(self, checkpoint_dir: Path) -> None:
+        """Merge LoRA checkpoint, reload vLLM, and evaluate the fine-tuned model."""
+        import gc
+        import torch
+
+        # Free any leftover SFT GPU memory
+        gc.collect()
+        torch.cuda.empty_cache()
+
+        # Merge LoRA into base model (on CPU to avoid GPU contention)
+        merged_dir = self._merge_lora_checkpoint(checkpoint_dir)
+
+        # Reload vLLM with the merged weights
+        from ..models.vllm_model import VLLMModel
+
+        ft_model = VLLMModel(
+            model_name_or_path=str(merged_dir),
+            enable_thinking=self.model.enable_thinking,
+            thinking_budget_tokens=self.model.thinking_budget_tokens,
+            **self.model._engine_kwargs,
+        )
+
+        try:
+            self.evaluate_model_performance(
+                "post_training",
+                save_subdir="post_training_evaluation",
+                model=ft_model,
+            )
+        finally:
+            ft_model.unload()
+
+    def _merge_lora_checkpoint(self, checkpoint_dir: Path) -> Path:
+        """Merge LoRA adapter with the base model and save to disk."""
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        from peft import PeftModel
+
+        merged_dir = Path(self.output_dir) / "merged_checkpoint"
+        merged_dir.mkdir(parents=True, exist_ok=True)
+
+        logger.info(f"Merging LoRA adapter from {checkpoint_dir} into {self.config.model_name_or_path} ...")
+
+        base_model = AutoModelForCausalLM.from_pretrained(
+            self.config.model_name_or_path,
+            torch_dtype=torch.bfloat16,
+            device_map="cpu",
+            trust_remote_code=True,
+        )
+        model = PeftModel.from_pretrained(base_model, str(checkpoint_dir))
+        model = model.merge_and_unload()
+
+        logger.info(f"Saving merged model to {merged_dir} ...")
+        model.save_pretrained(str(merged_dir))
+
+        tokenizer = AutoTokenizer.from_pretrained(
+            self.config.model_name_or_path, trust_remote_code=True
+        )
+        tokenizer.save_pretrained(str(merged_dir))
+
+        del model, base_model
+        import gc
+        gc.collect()
+
+        logger.info("LoRA merge complete.")
+        return merged_dir
 
     def _apply_lora(self, hf_model) -> Any:
         """Wrap model with PEFT LoRA adapters and log trainable parameter count."""

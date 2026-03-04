@@ -291,22 +291,24 @@ class Trainer(ABC):
     # UTILITY METHODS
     # ================================
 
-    def evaluate_model_performance(self, stage: str, save_rollout_messages: Optional[bool] = None) -> Optional[Dict[str, EvaluationReport]]:
+    def evaluate_model_performance(self, stage: str, save_rollout_messages: Optional[bool] = None, save_subdir: str = "evaluation", model: Optional[BaseModel] = None) -> Optional[Dict[str, EvaluationReport]]:
         """
         Helper method for model evaluation that subclasses can use.
         Evaluation results are automatically saved to files by the evaluator.
-        
+
         Args:
             stage: Stage name (e.g., "pre_training", "post_training")
+            save_subdir: Subdirectory to save results to
+            model: Optional model override (defaults to self.model)
         """
         evaluation_samples = self.dataset.get_val_samples()
         self.logger.info(f"Evaluating model performance at {stage}...")
-        
+
         reports = self.model_evaluator.evaluate_with_model(
-            model=self.model,
+            model=model or self.model,
             samples=evaluation_samples,
             save_rollout_messages=save_rollout_messages,
-            save_subdir="evaluation",
+            save_subdir=save_subdir,
         )
         
         if reports:
