@@ -47,8 +47,8 @@ class LocalTrainingConfig(BaseTrainingConfig):
     # Set to a local checkpoint directory for subsequent expert-iteration rounds.
     model_name_or_path: str = "Qwen/Qwen3-8B"
 
-    # Expert-iteration filter: only train on rollouts whose score meets this bar.
-    # 0.0 keeps all selected rollouts; 1.0 keeps only perfectly correct ones.
+    # Expert-iteration filter: only train on rollouts whose score exceeds this bar.
+    # 0.0 excludes invalid rollouts (score=0); 1.0 keeps only perfectly correct ones.
     min_score_threshold: float = 0.0
 
     # ---- LoRA ----

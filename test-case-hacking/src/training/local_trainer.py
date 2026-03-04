@@ -140,19 +140,17 @@ class LocalTrainer(Trainer):
     # ================================
 
     def _filter_by_score(self, rollouts: List[Rollout]) -> List[Rollout]:
-        """Keep only rollouts whose evaluation score meets the configured threshold."""
+        """Keep only rollouts whose evaluation score exceeds the configured threshold."""
         threshold = self.config.min_score_threshold
-        if threshold <= 0.0:
-            return rollouts
 
         filtered = [
             r
             for r in rollouts
             if r.evaluation_result is not None
-            and r.evaluation_result.score >= threshold
+            and r.evaluation_result.score > threshold
         ]
         logger.info(
-            f"Score filter (>= {threshold}): "
+            f"Score filter (> {threshold}): "
             f"{len(filtered)}/{len(rollouts)} rollouts kept"
         )
         return filtered

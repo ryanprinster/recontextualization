@@ -22,9 +22,9 @@ training_seed: ${training_seed}
 model_name_or_path: Qwen/Qwen3-8B
 
 # ---- expert iteration filter ----
-# 1.0 → train only on perfectly correct rollouts (recommended for EI)
-# 0.0 → train on all selected rollouts regardless of score
-min_score_threshold: 1.0
+# Rollouts with score > threshold are kept for training.
+# 0.0 → exclude only invalid rollouts (score=0); 1.0 → only perfectly correct.
+min_score_threshold: 0.0
 
 # ---- LoRA ----
 use_lora: true
