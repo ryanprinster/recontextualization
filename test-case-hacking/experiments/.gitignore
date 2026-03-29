@@ -1,0 +1,11 @@
+# Experiment output directories (created by sweep scripts)
+context_sweep/
+training/
+prompt_sweep/
+base_suffix_sweep/
+ifeval_results/
+
+# Model weights
+*.pt
+*.safetensors
+*.bin
