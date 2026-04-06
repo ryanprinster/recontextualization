@@ -1,0 +1,4 @@
+- dataset.test_split=oneoff
+- evaluation.contexts=[standard]
+- sample_source=all
+- seed=42

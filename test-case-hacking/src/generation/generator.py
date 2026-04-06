@@ -132,9 +132,19 @@ class RolloutGenerator:
 
                 # Generate rollouts for this batch using dataset
                 batch_grouped_rollouts = self.dataset.generate_rollouts_batch(
-                    batch_samples, model_generate_fn, 
+                    batch_samples, model_generate_fn,
                     n_rollouts=generation_config.n_rollouts
                 )
+
+                # Attach generation metadata from model (if available)
+                gen_metadata = getattr(self.model, '_last_generation_metadata', None)
+                if gen_metadata:
+                    flat_idx = 0
+                    for group in batch_grouped_rollouts:
+                        for rollout in group:
+                            if flat_idx < len(gen_metadata) and gen_metadata[flat_idx]:
+                                rollout.metadata = gen_metadata[flat_idx][0]
+                            flat_idx += 1
 
                 # Evaluate rollouts immediately if requested
                 if evaluate:

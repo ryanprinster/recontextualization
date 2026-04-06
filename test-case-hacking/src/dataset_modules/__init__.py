@@ -12,7 +12,9 @@ from .base import (
 )
 from .code_selection import CodeSelectionDataset
 from .factory import create_dataset
+from .impossible_livecode import ImpossibleLiveCodeDataset
 from .livecode_bench import LiveCodeDataset
+from .rl_rewardhacking import RLRewardHackingDataset
 
 __all__ = [
     "BaseDataset",
@@ -24,6 +26,8 @@ __all__ = [
     "BaseEvaluator",
     "BaseRolloutGenerator",
     "CodeSelectionDataset",
+    "ImpossibleLiveCodeDataset",
     "LiveCodeDataset",
+    "RLRewardHackingDataset",
     "create_dataset",
 ]

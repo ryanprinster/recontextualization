@@ -72,7 +72,8 @@ class RolloutStorage:
                                 "model_response": rollout.final_response,
                                 **({"messages": rollout.messages} if include_messages else {})
                             },
-                            "evaluation": rollout.evaluation_result.to_summary() if rollout.evaluation_result else None
+                            "evaluation": rollout.evaluation_result.to_summary() if rollout.evaluation_result else None,
+                            **({"metadata": rollout.metadata} if rollout.metadata else {})
                         }
                         for rollout in sample_rollouts
                     ]

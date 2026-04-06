@@ -1,0 +1,13 @@
+# @package _global_
+defaults:
+  - /components/model: qwen3_8b_nothink
+  - /components/dataset: rl_rewardhacking_aware
+  - /components/evaluation: rl_rewardhacking
+  - _self_
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+sample_source: "all"
+hydra:
+  run:
+    dir: experiments/evaluation/rl_rewardhacking_aware_qwen3_8b_nothink/${now:%Y-%m-%d_%H-%M-%S}

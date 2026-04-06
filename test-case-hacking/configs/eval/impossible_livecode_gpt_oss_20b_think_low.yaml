@@ -1,0 +1,24 @@
+# @package _global_
+# Evaluation on Impossible LiveCode dataset
+defaults:
+  - /components/model: gpt_oss_20b_think_low
+  - /components/dataset: impossible_livecode
+  - /components/evaluation: impossible_livecode
+  - _self_
+
+# Global settings
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+# Dataset override for test split
+dataset:
+  test_split: "oneoff"
+
+# Evaluation settings
+sample_source: "all"
+
+# Hydra output directory
+hydra:
+  run:
+    dir: experiments/evaluation/impossible_livecode_gpt_oss_20b_think_low/${now:%Y-%m-%d_%H-%M-%S}

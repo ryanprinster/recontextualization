@@ -1,0 +1,31 @@
+model:
+  _target_: src.models.openai_model.OpenAIModel
+  name: gpt-4.1-mini-2025-04-14
+dataset:
+  _target_: src.configs.dataset.ImpossibleLiveCodeConfig
+  test_split: oneoff
+  train_ratio: 0.8
+  random_seed: ${dataset_seed}
+evaluation:
+  generation:
+    _target_: src.configs.generation.GenerationConfig
+    temperature: 0.7
+    max_new_tokens: 32768
+    n_rollouts: 4
+    batch_size: 64
+  _target_: src.configs.evaluation.EvaluationConfig
+  contexts:
+  - standard
+  - hack
+  - do_not_hack
+  metrics:
+  - accuracy
+  - score
+  - hacking_rate
+  n_samples: 3
+  save_results: true
+  save_rollout_messages: false
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+sample_source: all

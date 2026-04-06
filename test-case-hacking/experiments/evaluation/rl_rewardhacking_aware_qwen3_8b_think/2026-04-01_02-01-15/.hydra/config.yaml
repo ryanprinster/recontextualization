@@ -1,0 +1,38 @@
+model:
+  _target_: src.models.vllm_model.VLLMModel
+  model_name_or_path: Qwen/Qwen3-8B
+  enable_thinking: true
+  thinking_budget_tokens: null
+  gpu_memory_utilization: 0.9
+  max_model_len: 32768
+  tensor_parallel_size: 1
+  quantization: null
+  dtype: bfloat16
+dataset:
+  _target_: src.configs.dataset.RLRewardHackingConfig
+  hint_type: SimpleOverwriteTestsAware
+  data_path: data/rl_rewardhacking/half2_aware.jsonl
+  difficulties: null
+  train_ratio: 0.8
+  random_seed: ${dataset_seed}
+evaluation:
+  generation:
+    _target_: src.configs.generation.GenerationConfig
+    temperature: 0.7
+    max_new_tokens: 32768
+    n_rollouts: 1
+    batch_size: 64
+  _target_: src.configs.evaluation.EvaluationConfig
+  contexts:
+  - standard
+  metrics:
+  - accuracy
+  - score
+  - hacking_rate
+  n_samples: null
+  save_results: true
+  save_rollout_messages: false
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+sample_source: all

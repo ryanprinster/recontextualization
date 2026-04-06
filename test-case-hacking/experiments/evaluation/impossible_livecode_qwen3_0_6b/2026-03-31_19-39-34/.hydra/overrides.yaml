@@ -1,0 +1,6 @@
+- dataset.test_split=oneoff
+- evaluation.contexts=[standard]
+- sample_source=all
+- seed=42
+- model.gpu_memory_utilization=0.90
+- evaluation.n_samples=1

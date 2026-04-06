@@ -1,0 +1,3 @@
+- evaluation.contexts=[standard]
+- evaluation.generation.n_rollouts=1
+- model.gpu_memory_utilization=0.08

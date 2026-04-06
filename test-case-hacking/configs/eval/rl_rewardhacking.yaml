@@ -1,0 +1,24 @@
+# @package _global_
+# Evaluation on RL Reward Hacking dataset
+defaults:
+  - /components/model: gpt4_1_mini
+  - /components/dataset: rl_rewardhacking
+  - /components/evaluation: rl_rewardhacking
+  - _self_
+
+# Global settings
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+# Dataset override for loophole variant
+dataset:
+  hint_type: "SimpleOverwriteTests"
+
+# Evaluation settings
+sample_source: "all"
+
+# Hydra output directory
+hydra:
+  run:
+    dir: experiments/evaluation/rl_rewardhacking/${now:%Y-%m-%d_%H-%M-%S}

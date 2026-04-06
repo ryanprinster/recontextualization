@@ -6,9 +6,9 @@ following the clean architecture with no circular dependencies.
 """
 
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
-from ..base import BaseDataset
+from ..base import BaseDataset, Sample, ProcessedSample
 from .evaluation import CodeGenerationEvaluator
 from .contexts import CodeGenerationContextHandler
 from .rollout_generator import CodeGenerationRolloutGenerator
@@ -37,12 +37,14 @@ class CodeGenerationDataset(BaseDataset):
         self,
         data_path: str = "data/coding_problems.jsonl",
         use_incorrect_tests: bool = False,
+        base_suffix: str = None,
         train_ratio: float = 0.8,
         random_seed: int = 42
     ):
-        # Initialize dataset-specific attributes  
+        # Initialize dataset-specific attributes
         self.data_path = data_path
         self.use_incorrect_tests = use_incorrect_tests
+        self.base_suffix = base_suffix
         
         # Load and split data
         self.samples = self.load_samples()
@@ -81,6 +83,10 @@ class CodeGenerationDataset(BaseDataset):
         
         return samples
     
+    def process_sample(self, sample: Sample, context: str) -> ProcessedSample:
+        """Process a raw sample for a specific context, forwarding base_suffix if set."""
+        return self.context_handler_class.apply_context(context, sample, base_suffix=self.base_suffix)
+
     def get_dataset_info(self) -> Dict[str, Any]:
         """Get information about the dataset"""
         hackable_count = len([

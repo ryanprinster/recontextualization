@@ -1,0 +1,8 @@
+# @package dataset
+_target_: src.configs.dataset.RLRewardHackingConfig
+
+hint_type: "SimpleOverwriteTestsAware"
+data_path: "data/rl_rewardhacking/half2_aware.jsonl"
+difficulties: null
+train_ratio: 0.8
+random_seed: ${dataset_seed}

@@ -1,0 +1,13 @@
+# @package _global_
+defaults:
+  - /components/model: gpt_oss_20b_think_medium
+  - /components/dataset: rl_rewardhacking_simple
+  - /components/evaluation: rl_rewardhacking
+  - _self_
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+sample_source: "all"
+hydra:
+  run:
+    dir: experiments/evaluation/rl_rewardhacking_simple_gpt_oss_20b_think_medium/${now:%Y-%m-%d_%H-%M-%S}

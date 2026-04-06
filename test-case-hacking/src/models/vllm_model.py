@@ -86,6 +86,7 @@ class VLLMModel(BaseModel):
             model_name_or_path=model_name_or_path,
             **self._engine_kwargs,
         )
+        self._last_generation_metadata: List[List[Dict[str, Any]]] = []
         logger.info("vLLM engine ready.")
 
     # ================================
@@ -197,7 +198,15 @@ class VLLMModel(BaseModel):
             use_tqdm=False,  # Caller (RolloutGenerator) owns the progress bar.
         )
 
-        return [self._extract_responses(output) for output in outputs]
+        results = []
+        metadata = []
+        for output in outputs:
+            responses, meta = self._extract_responses_with_metadata(output)
+            results.append(responses)
+            metadata.append(meta)
+        self._last_generation_metadata = metadata
+
+        return results
 
     def _build_sampling_params(
         self,
@@ -229,28 +238,36 @@ class VLLMModel(BaseModel):
 
         return SamplingParams(**kwargs)
 
-    def _extract_responses(self, request_output) -> List[str]:
+    def _extract_responses_with_metadata(self, request_output):
         """
-        Convert a single vLLM RequestOutput into a list of response strings.
+        Convert a single vLLM RequestOutput into response strings and per-completion metadata.
 
-        Handles two vLLM behaviours for thinking-mode models:
-          - Older / non-thinking: full text (including any <think> tags) is in
-            completion.text.
-          - Newer thinking API: completion.reasoning_content holds the thinking
-            block and completion.text holds the final answer only.  We stitch
-            them back together so callers always see the complete response.
+        Returns:
+            Tuple of (responses: List[str], metadata: List[Dict[str, Any]])
         """
         responses = []
+        metadata = []
         for completion in request_output.outputs:
             reasoning = getattr(completion, "reasoning_content", None)
+            total_tokens = len(completion.token_ids)
+
             if reasoning:
-                # Stitch CoT and answer into one string matching what the model
-                # would produce if we read its raw output token stream.
                 text = f"<think>\n{reasoning}\n</think>\n{completion.text}"
+                # Estimate think_end position: reasoning tokens vs total tokens.
+                # The reasoning_content doesn't give exact token count, so we
+                # approximate from the character ratio.
+                reasoning_char_ratio = len(reasoning) / max(len(text), 1)
+                think_end_token_position = int(total_tokens * reasoning_char_ratio)
             else:
                 text = completion.text
+                think_end_token_position = 0
+
             responses.append(text)
-        return responses
+            metadata.append({
+                "total_tokens": total_tokens,
+                "think_end_token_position": think_end_token_position,
+            })
+        return responses, metadata
 
     # ================================
     # PERSISTENCE

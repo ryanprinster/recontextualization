@@ -96,6 +96,7 @@ class Rollout:
     messages: List[Dict[str, str]]  # Complete conversation history
     final_response: str
     evaluation_result: Optional[EvaluationResult] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
     
     def to_summary(self, include_messages: bool = True) -> Dict[str, Any]:
         """Convert to summary dict with clean structure for review/analysis
@@ -116,15 +117,19 @@ class Rollout:
         result = {
             # SAMPLE: Ground truth data and metadata
             "sample": self.sample.sample.to_summary(),
-            
-            # ROLLOUT: Conversation and model response  
+
+            # ROLLOUT: Conversation and model response
             "rollout": rollout_data
         }
-        
+
         # EVALUATION: Results and metrics (if available)
         if self.evaluation_result:
             result["evaluation"] = self.evaluation_result.to_summary()
-        
+
+        # METADATA: Token counts and other generation metadata
+        if self.metadata:
+            result["metadata"] = self.metadata
+
         return result
 
 
@@ -207,6 +212,7 @@ class BaseContextHandler(ABC):
             messages=complete_messages,
             final_response=original_rollout.final_response,
             evaluation_result=original_rollout.evaluation_result,
+            metadata=original_rollout.metadata,
         )
 
 

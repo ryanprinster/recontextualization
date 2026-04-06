@@ -27,16 +27,25 @@ class OpenAIModel(BaseModel):
         timeout: int = 60,
         max_retries: int = 3,
         rate_limit_delay: float = 1.0,
+        base_url: Optional[str] = None,
+        api_key: Optional[str] = None,
+        extra_body: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(name)
-        
+
         self.use_async = use_async
         self.timeout = timeout
         self.max_retries = max_retries
         self.rate_limit_delay = rate_limit_delay
         self.model_ref = name  # Unified model reference
-        
-        self.client = AsyncOpenAI() if use_async else OpenAI()
+        self.extra_body = extra_body
+
+        client_kwargs = {}
+        if base_url is not None:
+            client_kwargs["base_url"] = base_url
+        if api_key is not None:
+            client_kwargs["api_key"] = api_key
+        self.client = AsyncOpenAI(**client_kwargs) if use_async else OpenAI(**client_kwargs)
     
     def generate(
         self,
@@ -73,10 +82,10 @@ class OpenAIModel(BaseModel):
                     try:
                         # Use appropriate client call
                         if self.use_async:
-                            response = await self.client.chat.completions.create(messages=messages, **params)
+                            response = await self.client.chat.completions.create(messages=messages, extra_body=self.extra_body, **params)
                         else:
-                            response = self.client.chat.completions.create(messages=messages, **params)
-                        return [choice.message.content.strip() for choice in response.choices]
+                            response = self.client.chat.completions.create(messages=messages, extra_body=self.extra_body, **params)
+                        return [(choice.message.content or "").strip() for choice in response.choices]
                     except Exception as e:
                         logger.warning(f"API call failed (attempt {attempt + 1}): {e}")
                         if attempt < self.max_retries - 1:

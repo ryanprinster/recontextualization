@@ -13,6 +13,8 @@ from ..configs.dataset import (
     CodeSelectionConfig,
     LiveCodeBenchConfig,
     CodeGenerationConfig,
+    RLRewardHackingConfig,
+    ImpossibleLiveCodeConfig,
 )
 from .base import BaseDataset
 
@@ -37,6 +39,8 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
     from .code_selection.dataset import CodeSelectionDataset
     from .livecode_bench.dataset import LiveCodeDataset
     from .code_generation.dataset import CodeGenerationDataset
+    from .rl_rewardhacking.dataset import RLRewardHackingDataset
+    from .impossible_livecode.dataset import ImpossibleLiveCodeDataset
 
     if isinstance(config, CodeSelectionConfig):
         return CodeSelectionDataset(
@@ -54,9 +58,24 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
         )
+    elif isinstance(config, RLRewardHackingConfig):
+        return RLRewardHackingDataset(
+            data_path=config.data_path,
+            hint_type=config.hint_type,
+            difficulties=config.difficulties,
+            train_ratio=config.train_ratio,
+            random_seed=config.random_seed,
+        )
+    elif isinstance(config, ImpossibleLiveCodeConfig):
+        return ImpossibleLiveCodeDataset(
+            test_split=config.test_split,
+            train_ratio=config.train_ratio,
+            random_seed=config.random_seed,
+        )
     elif isinstance(config, CodeGenerationConfig):
         return CodeGenerationDataset(
             use_incorrect_tests=config.use_incorrect_tests,
+            base_suffix=config.base_suffix,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
         )

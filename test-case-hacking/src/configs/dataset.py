@@ -38,3 +38,20 @@ class CodeGenerationConfig(BaseDatasetConfig):
     """Code generation dataset configuration"""
 
     use_incorrect_tests: bool = False
+    base_suffix: Optional[str] = None
+
+
+@dataclass
+class RLRewardHackingConfig(BaseDatasetConfig):
+    """RL Reward Hacking dataset configuration"""
+
+    hint_type: str = "SimpleOverwriteTests"
+    difficulties: Optional[List[str]] = None
+    data_path: str = "data/rl_rewardhacking/leetcode_train_medhard_filtered.jsonl"
+
+
+@dataclass
+class ImpossibleLiveCodeConfig(BaseDatasetConfig):
+    """Impossible LiveCode dataset configuration"""
+
+    test_split: str = "oneoff"  # "original", "oneoff", or "conflicting"

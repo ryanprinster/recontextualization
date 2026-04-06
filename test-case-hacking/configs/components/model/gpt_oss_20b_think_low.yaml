@@ -1,0 +1,12 @@
+# @package model
+_target_: src.models.openai_model.OpenAIModel
+
+name: openai/gpt-oss-20b
+base_url: http://localhost:8000/v1
+api_key: "dummy"
+use_async: true
+timeout: 180
+max_retries: 5
+rate_limit_delay: 2.0
+extra_body:
+  reasoning_effort: low

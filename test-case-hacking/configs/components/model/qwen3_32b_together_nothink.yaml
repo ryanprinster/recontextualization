@@ -1,0 +1,12 @@
+# @package model
+_target_: src.models.openai_model.OpenAIModel
+
+name: Qwen/Qwen3-32B
+base_url: https://api.together.xyz/v1
+api_key: ${oc.env:TOGETHER_API_KEY}
+use_async: true
+timeout: 120
+max_retries: 5
+rate_limit_delay: 2.0
+extra_body:
+  enable_thinking: false
