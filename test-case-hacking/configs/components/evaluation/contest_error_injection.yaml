@@ -14,4 +14,4 @@ metrics: ["accuracy", "score"]
 # Evaluation settings
 n_samples: null
 save_results: true
-save_rollout_messages: false
+save_rollout_messages: true

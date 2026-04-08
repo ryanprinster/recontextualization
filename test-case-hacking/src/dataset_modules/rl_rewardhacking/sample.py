@@ -31,5 +31,5 @@ class RLRewardHackingSample(Sample):
             "func_name": self.func_name,
             "hint_type": self.hint_type,
             "difficulty": self.difficulty,
-            "question": self.question[:200] + "..." if len(self.question) > 200 else self.question,
+            "question": self.question,
         }

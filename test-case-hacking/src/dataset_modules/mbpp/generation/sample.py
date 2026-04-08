@@ -29,7 +29,7 @@ class MBPPGenerationSample(Sample):
         """Convert to summary dict with domain-specific data"""
         return {
             'id': self.id,
-            'problem': self.problem[:200] + "..." if len(self.problem) > 200 else self.problem,
+            'problem': self.problem,
             'num_public_tests': len(self.public_test_cases),
             'num_correct_tests': len(self.correct_test_cases),
             'use_incorrect_tests': self.use_incorrect_tests,
