@@ -1,0 +1,48 @@
+# @package training
+# GRPOTrainingConfig - Group Relative Policy Optimization via TRL.
+#
+# Unlike Expert Iteration (generate best -> SFT), GRPO generates multiple
+# completions per prompt, computes group-relative advantages from execution
+# rewards, and updates the policy with clipped policy-gradient loss.
+#
+# Usage:
+#   python scripts/train.py --config-name train/local_grpo
+_target_: src.configs.training.GRPOTrainingConfig
+
+defaults:
+  - /components/generation: training_cot
+
+# ---- base settings ----
+generation_context: standard
+max_train_samples: null
+training_seed: ${training_seed}
+
+# ---- model ----
+model_name_or_path: Qwen/Qwen3-8B
+
+# ---- GRPO params ----
+num_generations: 8          # completions per prompt (group size)
+num_iterations: 1           # optimization iterations per generation batch
+kl_coef: 0.04              # KL divergence penalty
+cliprange: 0.2              # PPO clip range
+loss_type: grpo             # loss variant: grpo, dapo, dr_grpo, etc.
+scale_rewards: group        # reward normalisation: group, batch, none
+
+# ---- generation ----
+max_completion_length: 8192
+temperature: 1.0
+
+# ---- LoRA ----
+use_lora: true
+lora_r: 64
+lora_alpha: 128
+lora_dropout: 0.05
+lora_target_modules: null   # null -> PEFT auto-detects all linear layers
+
+# ---- optimizer ----
+num_train_epochs: 1
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 4
+learning_rate: 5.0e-6
+lr_scheduler_type: cosine
+warmup_ratio: 0.1

@@ -27,6 +27,7 @@ from ..configs import RecontextualizationConfig
 from .trainer import Trainer, TrainingResult
 from .openai_trainer import OpenAITrainer
 from .local_trainer import LocalTrainer
+from .grpo_trainer import LocalGRPOTrainer
 
 
 __all__ = [
@@ -41,4 +42,5 @@ __all__ = [
     "TrainingResult",
     "OpenAITrainer",
     "LocalTrainer",
+    "LocalGRPOTrainer",
 ]

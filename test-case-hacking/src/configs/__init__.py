@@ -12,7 +12,7 @@ from .dataset import (
     RLRewardHackingConfig,
     ImpossibleLiveCodeConfig,
 )
-from .training import BaseTrainingConfig, LocalTrainingConfig, OpenAITrainingConfig
+from .training import BaseTrainingConfig, GRPOTrainingConfig, LocalTrainingConfig, OpenAITrainingConfig
 from .output import OutputConfig
 from .evaluation import EvaluationConfig
 
@@ -35,6 +35,7 @@ __all__ = [
     
     # Training configs
     "BaseTrainingConfig",
+    "GRPOTrainingConfig",
     "LocalTrainingConfig",
     "OpenAITrainingConfig",
     

@@ -68,3 +68,45 @@ class LocalTrainingConfig(BaseTrainingConfig):
     warmup_ratio: float = 0.05
     # Max tokens per training example (longer sequences are truncated).
     max_seq_length: int = 8192
+
+
+@dataclass
+class GRPOTrainingConfig(BaseTrainingConfig):
+    """
+    GRPO (Group Relative Policy Optimization) training config for local models.
+
+    Uses TRL's GRPOTrainer internally. Generation and optimization are
+    interleaved: the policy generates multiple completions per prompt, rewards
+    are computed via code execution, advantages are normalised within each
+    prompt's group, and the policy is updated with clipped policy-gradient loss.
+    """
+
+    # Path/name of the model to load for training.
+    model_name_or_path: str = "Qwen/Qwen3-8B"
+
+    # ---- GRPO-specific ----
+    num_generations: int = 8        # completions per prompt (group size)
+    num_iterations: int = 1         # optimization iterations per generation batch
+    kl_coef: float = 0.04           # KL divergence penalty coefficient
+    cliprange: float = 0.2          # PPO clip range (epsilon)
+    loss_type: str = "grpo"         # loss variant: "grpo", "dapo", "dr_grpo", etc.
+    scale_rewards: str = "group"    # reward normalisation: "group", "batch", "none"
+
+    # ---- Generation ----
+    max_completion_length: int = 8192  # max tokens for each completion
+    temperature: float = 1.0
+
+    # ---- LoRA ----
+    use_lora: bool = True
+    lora_r: int = 16
+    lora_alpha: int = 32
+    lora_dropout: float = 0.05
+    lora_target_modules: Optional[List[str]] = None
+
+    # ---- Optimizer / scheduler ----
+    num_train_epochs: int = 1
+    per_device_train_batch_size: int = 1
+    gradient_accumulation_steps: int = 8
+    learning_rate: float = 5e-6
+    lr_scheduler_type: str = "cosine"
+    warmup_ratio: float = 0.1

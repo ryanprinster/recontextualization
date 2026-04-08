@@ -1,0 +1,36 @@
+# @package _global_
+# GRPO training with Qwen3-8B: code-execution rewards + policy gradient.
+#
+# Usage:
+#   python scripts/train.py --config-name train/local_grpo
+#
+# From a checkpoint:
+#   python scripts/train.py --config-name train/local_grpo \
+#       model=qwen3_8b_ckpt \
+#       model.model_name_or_path=/path/to/prev/checkpoint \
+#       training.model_name_or_path=/path/to/prev/checkpoint
+defaults:
+  - /components/model: qwen3_8b
+  - /components/dataset: code_generation
+  - /components/training: grpo
+  - /components/evaluation: code_generation
+  - _self_
+
+# ---- global settings ----
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+device: auto
+
+# ---- dataset ----
+dataset:
+  use_incorrect_tests: true   # include the intentionally buggy test
+
+# ---- training overrides ----
+training:
+  generation_context: do_not_hack
+
+# ---- hydra output ----
+hydra:
+  run:
+    dir: experiments/training/local_grpo/${now:%Y-%m-%d_%H-%M-%S}
