@@ -43,6 +43,10 @@ local = [
     "peft>=0.10.0",
     "accelerate>=0.30.0",
 ]
+tinker = [
+    "tinker",
+    "tinker-cookbook",
+]
 
 [tool.setuptools.packages.find]
 include = ["src*"]

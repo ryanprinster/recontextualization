@@ -110,3 +110,39 @@ class GRPOTrainingConfig(BaseTrainingConfig):
     learning_rate: float = 5e-6
     lr_scheduler_type: str = "cosine"
     warmup_ratio: float = 0.1
+
+
+@dataclass
+class TinkerTrainingConfig(BaseTrainingConfig):
+    """Training config for Tinker managed LoRA training via remote API."""
+
+    # Base model identifier (e.g. "meta-llama/Llama-3.1-8B")
+    base_model: str = "meta-llama/Llama-3.1-8B"
+
+    # Expert-iteration filter: only train on rollouts whose score exceeds this.
+    min_score_threshold: float = 0.0
+
+    # LoRA (Tinker-managed)
+    lora_rank: int = 32
+    train_mlp: bool = True
+    train_attn: bool = True
+    train_unembed: bool = False
+
+    # Optimizer (AdamW)
+    learning_rate: float = 2e-4
+    adam_beta1: float = 0.9
+    adam_beta2: float = 0.999
+    adam_eps: float = 1e-8
+
+    # Training loop
+    n_epochs: int = 1
+    batch_size: int = 4
+    max_seq_length: int = 8192
+    train_on_what: str = "last_turn"
+
+    # Checkpointing
+    save_every: int = 0  # Save state every N steps (0 = only final)
+    checkpoint_ttl_seconds: int = 86400  # 24h default TTL
+
+    # Seed for Tinker training client
+    seed: Optional[int] = None

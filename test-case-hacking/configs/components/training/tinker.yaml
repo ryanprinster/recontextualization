@@ -1,0 +1,43 @@
+# @package training
+# TinkerTrainingConfig — expert iteration via Tinker's managed LoRA training.
+#
+# Generation uses whatever BaseModel is passed to the trainer.
+# Fine-tuning runs remotely on Tinker's GPU clusters.
+_target_: src.configs.training.TinkerTrainingConfig
+
+defaults:
+  - /components/generation: training_cot
+
+# ---- base settings ----
+generation_context: standard
+max_train_samples: null
+training_seed: ${training_seed}
+
+# ---- Tinker base model ----
+base_model: meta-llama/Llama-3.1-8B
+
+# ---- expert iteration filter ----
+min_score_threshold: 0.0
+
+# ---- LoRA (Tinker-managed) ----
+lora_rank: 32
+train_mlp: true
+train_attn: true
+train_unembed: false
+
+# ---- optimizer (AdamW) ----
+learning_rate: 2.0e-4
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_eps: 1.0e-8
+
+# ---- training loop ----
+n_epochs: 1
+batch_size: 4
+max_seq_length: 8192
+train_on_what: last_turn
+
+# ---- checkpointing ----
+save_every: 0                   # 0 = only final checkpoint
+checkpoint_ttl_seconds: 86400   # 24h TTL
+seed: ${training_seed}
