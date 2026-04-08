@@ -238,7 +238,7 @@ class LocalGRPOTrainer(Trainer):
             )
 
         # Build GRPOConfig
-        grpo_config = GRPOConfig(
+        grpo_kwargs = dict(
             output_dir=str(checkpoint_dir),
             # GRPO-specific
             num_generations=self.config.num_generations,
@@ -260,12 +260,24 @@ class LocalGRPOTrainer(Trainer):
             # Misc
             bf16=True,
             gradient_checkpointing=True,
-            logging_steps=10,
+            logging_steps=1,
             save_strategy="no",
             seed=self.config.training_seed or 42,
             log_completions=True,
             remove_unused_columns=False,
         )
+
+        # vLLM generation (much faster than HF generate)
+        if self.config.use_vllm:
+            grpo_kwargs.update(
+                use_vllm=True,
+                vllm_mode=self.config.vllm_mode,
+                vllm_gpu_memory_utilization=self.config.vllm_gpu_memory_utilization,
+            )
+            if self.config.vllm_max_model_length is not None:
+                grpo_kwargs["vllm_max_model_length"] = self.config.vllm_max_model_length
+
+        grpo_config = GRPOConfig(**grpo_kwargs)
 
         logger.info(
             f"Initialising TRL GRPOTrainer with model={self.config.model_name_or_path}, "

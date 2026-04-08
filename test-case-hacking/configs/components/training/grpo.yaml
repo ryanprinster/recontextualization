@@ -28,6 +28,12 @@ cliprange: 0.2              # PPO clip range
 loss_type: grpo             # loss variant: grpo, dapo, dr_grpo, etc.
 scale_rewards: group        # reward normalisation: group, batch, none
 
+# ---- vLLM generation ----
+use_vllm: true
+vllm_mode: colocate              # "colocate" (same process) or "server" (separate)
+vllm_gpu_memory_utilization: 0.3  # GPU memory fraction for vLLM in colocate mode
+vllm_max_model_length: null       # null = infer from model config
+
 # ---- generation ----
 max_completion_length: 8192
 temperature: 1.0
