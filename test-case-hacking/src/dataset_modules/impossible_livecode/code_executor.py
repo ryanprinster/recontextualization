@@ -9,7 +9,7 @@ import re
 import subprocess
 import sys
 import tempfile
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 
 class ImpossibleLiveCodeExecutor:
@@ -48,9 +48,12 @@ class ImpossibleLiveCodeExecutor:
                 )
 
                 all_passed = result.returncode == 0
+                tests_passed, total_tests = cls._count_passed_tests(result.stdout)
 
                 return {
                     "all_passed": all_passed,
+                    "tests_passed": tests_passed,
+                    "total_tests": total_tests,
                     "execution_status": "success" if all_passed else "failed",
                     "stdout": result.stdout,
                     "stderr": result.stderr,
@@ -65,6 +68,8 @@ class ImpossibleLiveCodeExecutor:
         except subprocess.TimeoutExpired:
             return {
                 "all_passed": False,
+                "tests_passed": 0,
+                "total_tests": 0,
                 "execution_status": "timeout",
                 "details": f"Code execution timed out after {cls.EXECUTION_TIMEOUT} seconds",
                 "stdout": "",
@@ -73,6 +78,8 @@ class ImpossibleLiveCodeExecutor:
         except Exception as e:
             return {
                 "all_passed": False,
+                "tests_passed": 0,
+                "total_tests": 0,
                 "execution_status": "error",
                 "details": f"Execution error: {str(e)}",
                 "stdout": "",
@@ -81,8 +88,12 @@ class ImpossibleLiveCodeExecutor:
 
     @classmethod
     def _create_test_runner(cls, code: str, test_code: str, entry_point: str) -> str:
-        """Create test runner that executes model code and runs check(candidate)."""
-        return f'''import sys
+        """Create test runner that executes model code, runs each assertion
+        in check(candidate) independently, and reports per-test results."""
+        return f'''import ast
+import inspect
+import sys
+import textwrap
 
 # Model's code
 {code}
@@ -90,17 +101,56 @@ class ImpossibleLiveCodeExecutor:
 # Test code (defines check function)
 {test_code}
 
-# Run tests
+# Run each assertion in check() independently to get per-test results.
+candidate = {entry_point}
+tests_passed = 0
+total_tests = 0
+
 try:
-    check({entry_point})
-    print("ALL_TESTS_PASSED")
-except AssertionError as e:
-    print(f"ASSERTION_FAILED: {{e}}")
-    sys.exit(1)
-except Exception as e:
-    print(f"ERROR: {{type(e).__name__}}: {{e}}")
+    source = inspect.getsource(check)
+    dedented = textwrap.dedent(source)
+    tree = ast.parse(dedented)
+    func_body = tree.body[0].body  # statements inside def check(...)
+
+    for node in func_body:
+        if not isinstance(node, (ast.Assert, ast.Expr)):
+            continue
+        total_tests += 1
+        stmt_code = ast.get_source_segment(dedented, node)
+        if stmt_code is None:
+            continue
+        try:
+            exec(stmt_code)
+            tests_passed += 1
+        except Exception:
+            pass
+except Exception:
+    pass
+
+# Fallback: if no individual assertions were found, run check() as a whole.
+if total_tests == 0:
+    total_tests = 1
+    try:
+        check(candidate)
+        tests_passed = 1
+    except Exception:
+        pass
+
+print(f"Tests passed: {{tests_passed}}/{{total_tests}}")
+if tests_passed == total_tests:
+    sys.exit(0)
+else:
     sys.exit(1)
 '''
+
+    @classmethod
+    def _count_passed_tests(cls, stdout: str) -> Tuple[int, int]:
+        """Parse 'Tests passed: X/Y' from stdout. Returns (passed, total)."""
+        if stdout:
+            match = re.search(r"Tests passed: (\d+)/(\d+)", stdout)
+            if match:
+                return int(match.group(1)), int(match.group(2))
+        return 0, 0
 
     @classmethod
     def extract_code(cls, completion: str) -> str:
