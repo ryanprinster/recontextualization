@@ -1,0 +1,15 @@
+# @package _global_
+defaults:
+  - /components/model: gpt_oss_20b_think_high
+  - /components/dataset: mbpp_generation
+  - /components/evaluation: mbpp_generation
+  - _self_
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+dataset:
+  use_incorrect_tests: true
+sample_source: "all"
+hydra:
+  run:
+    dir: experiments/evaluation/code_generation_gpt_oss_20b_think_high/${now:%Y-%m-%d_%H-%M-%S}

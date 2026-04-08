@@ -45,9 +45,9 @@ python scripts/status.py experiments/training/<run_dir>
 # Resume when finetuning completes:
 python scripts/resume.py experiments/training/<run_dir>
 # Evaluate a model:
-python scripts/eval.py --config-name eval/code_generation model.name="ft:gpt-4o-mini:..."
+python scripts/eval.py --config-name eval/mbpp_generation model.name="ft:gpt-4o-mini:..."
 # Pre-generate response cache:
-python scripts/pregenerate.py --config-name pregenerate/code_generation
+python scripts/pregenerate.py --config-name pregenerate/mbpp_generation
 ```
 
 ### deception-evasion-honesty
@@ -94,7 +94,7 @@ export HF_TOKEN="..." OPENAI_API_KEY="..."
 - `src/training/trainer.py` is the main trainer interface; `openai_trainer.py` and `local_trainer.py` are backends
 - `src/training/detection_methods/recontextualization.py` implements recontextualization detection
 - `src/training/selection_methods/best_of_n.py` implements best-of-N selection
-- `src/dataset_modules/` contains multiple dataset implementations (code_generation, livecode_bench, rl_rewardhacking)
+- `src/dataset_modules/` contains multiple dataset implementations (mbpp_generation, contest_error_injection, rl_rewardhacking)
 - `src/models/` wraps OpenAI and vLLM model interfaces
 - Async workflow: `train.py` starts jobs, `status.py` checks progress, `resume.py` continues when ready
 - Dataset: `data/coding_problems.jsonl` (243 problems)

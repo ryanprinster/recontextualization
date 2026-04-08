@@ -11,10 +11,10 @@
 #       training.model_name_or_path=/path/to/prev/checkpoint
 defaults:
   - /components/model: qwen3_8b
-  - /components/dataset: code_generation
+  - /components/dataset: mbpp_generation
   - /components/training: local
   - /components/selection: best_of_n
-  - /components/evaluation: code_generation
+  - /components/evaluation: mbpp_generation
   - _self_
 
 # ---- global settings ----

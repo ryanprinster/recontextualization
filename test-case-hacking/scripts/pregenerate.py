@@ -10,7 +10,7 @@ from src.storage import use_cache, save_rollouts_to_cache
 from src.experiment_utils import load_model_from_experiment_or_config
 
 
-@hydra.main(version_base=None, config_path="../configs", config_name="pregenerate/code_generation")
+@hydra.main(version_base=None, config_path="../configs", config_name="pregenerate/mbpp_generation")
 def main(cfg: DictConfig) -> None:
     """Pregenerate rollouts and cache them for fast experimentation"""
     

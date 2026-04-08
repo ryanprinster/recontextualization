@@ -6,10 +6,10 @@
 #   python scripts/train.py --config-name train/tinker_ei model=qwen3_8b
 defaults:
   - /components/model: tinker_llama
-  - /components/dataset: code_generation
+  - /components/dataset: mbpp_generation
   - /components/training: tinker
   - /components/selection: best_of_n
-  - /components/evaluation: code_generation
+  - /components/evaluation: mbpp_generation
   - _self_
 
 # ---- global settings ----

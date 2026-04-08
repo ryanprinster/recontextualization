@@ -122,13 +122,13 @@ This uses the trained model from that experiment.
 
 **2. Evaluate any model with config:**
 ```bash
-python scripts/eval.py --config-name eval/code_generation
+python scripts/eval.py --config-name eval/mbpp_generation
 ```
 This uses the model specified in the config (default: gpt4_1_mini).
 
 **Override model:**
 ```bash
-python scripts/eval.py --config-name eval/code_generation \
+python scripts/eval.py --config-name eval/mbpp_generation \
     model.name="ft:gpt-4o-mini:org:suffix:abc123"
 ```
 
@@ -151,7 +151,7 @@ Pre-generate model responses and cache them for faster experimentation.
 
 **Usage:**
 ```bash
-python scripts/pregenerate.py --config-name pregenerate/code_generation
+python scripts/pregenerate.py --config-name pregenerate/mbpp_generation
 ```
 
 **What it does:**
@@ -174,14 +174,14 @@ python scripts/pregenerate.py --config-name pregenerate/code_generation
 **Override parameters:**
 ```bash
 # Change model
-python scripts/pregenerate.py --config-name pregenerate/code_generation model=gpt4_1
+python scripts/pregenerate.py --config-name pregenerate/mbpp_generation model=gpt4_1
 
 # Change contexts
-python scripts/pregenerate.py --config-name pregenerate/code_generation \
+python scripts/pregenerate.py --config-name pregenerate/mbpp_generation \
     pregenerate.contexts='["standard", "do_not_hack"]'
 
 # Change number of rollouts
-python scripts/pregenerate.py --config-name pregenerate/code_generation \
+python scripts/pregenerate.py --config-name pregenerate/mbpp_generation \
     pregenerate.generation_configs.training.n_rollouts=32
 ```
 
@@ -206,7 +206,7 @@ These are internal utilities used by the other scripts. They live in `src/` rath
 
 1. **Optional: Pre-generate cache**
    ```bash
-   python scripts/pregenerate.py --config-name pregenerate/code_generation
+   python scripts/pregenerate.py --config-name pregenerate/mbpp_generation
    ```
 
 2. **Start training**
@@ -233,13 +233,13 @@ These are internal utilities used by the other scripts. They live in `src/` rath
 ### Quick Evaluation of Base Model
 
 ```bash
-python scripts/eval.py --config-name eval/code_generation
+python scripts/eval.py --config-name eval/mbpp_generation
 ```
 
 ### Evaluate Specific Model
 
 ```bash
-python scripts/eval.py --config-name eval/code_generation \
+python scripts/eval.py --config-name eval/mbpp_generation \
     model.name="ft:gpt-4o-mini:personal::BFxiYY8j"
 ```
 
@@ -273,7 +273,7 @@ Example config structure:
 ```yaml
 defaults:
   - /components/model: gpt4_1_mini
-  - /components/dataset: code_generation
+  - /components/dataset: mbpp_generation
   - /components/training: openai
 ```
 

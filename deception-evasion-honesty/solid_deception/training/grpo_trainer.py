@@ -1,5 +1,6 @@
 import copy
 import gc
+import json
 import math
 import os
 import pickle as pkl
@@ -2042,3 +2043,20 @@ class MyGRPOTrainer(Trainer):
 
                 if wandb.run is not None:  # type: ignore
                     wandb.log({"completions": wandb.Table(dataframe=df)})  # type: ignore
+
+            # Save trajectories to disk so the full prompts and responses are preserved
+            trajectories_dir = os.path.join(args.output_dir, "trajectories")
+            os.makedirs(trajectories_dir, exist_ok=True)
+            trajectory_path = os.path.join(
+                trajectories_dir, f"trajectories_step_{self.state.global_step}.jsonl"
+            )
+            with open(trajectory_path, "w") as f:
+                for i in range(len(df)):
+                    row = {
+                        "query": df.iloc[i]["query"],
+                        "model_response": df.iloc[i]["model response"],
+                        "score": float(df.iloc[i]["score"]),
+                        "global_step": int(df.iloc[i]["global_step"]),
+                    }
+                    f.write(json.dumps(row) + "\n")
+            print(f"Saved {len(df)} trajectories to {trajectory_path}")

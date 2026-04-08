@@ -2,10 +2,10 @@
 # Training on code generation with Best-of-N selection
 defaults:
   - /components/model: gpt4_1_mini
-  - /components/dataset: code_generation
+  - /components/dataset: mbpp_generation
   - /components/training: openai
   - /components/selection: best_of_n
-  - /components/evaluation: code_generation
+  - /components/evaluation: mbpp_generation
   - _self_
 
 # Global settings

@@ -26,5 +26,5 @@ class ImpossibleLiveCodeSample(Sample):
             "id": self.id,
             "entry_point": self.entry_point,
             "impossible_type": self.impossible_type,
-            "prompt": self.prompt[:200] + "..." if len(self.prompt) > 200 else self.prompt,
+            "prompt": self.prompt,
         }

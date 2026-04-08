@@ -94,12 +94,12 @@ configs = {}
 for size, marker, shade in MODELS:
     dname = DIR_NAMES[size]
     configs[f"{size} Thinking"] = {
-        "glob": f"{EVAL_ROOT}/code_generation_{dname}_think/*/evaluation/standard/evaluation_report_*.json",
+        "glob": f"{EVAL_ROOT}/mbpp_generation_{dname}_think/*/evaluation/standard/evaluation_report_*.json",
         "color": purples[shade],
         "marker": marker,
     }
     configs[f"{size} Non-thinking"] = {
-        "glob": f"{EVAL_ROOT}/code_generation_{dname}_nothink/*/evaluation/standard/evaluation_report_*.json",
+        "glob": f"{EVAL_ROOT}/mbpp_generation_{dname}_nothink/*/evaluation/standard/evaluation_report_*.json",
         "color": greens[shade],
         "marker": marker,
     }

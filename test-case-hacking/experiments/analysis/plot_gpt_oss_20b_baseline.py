@@ -81,7 +81,7 @@ configs = {}
 for level_label, marker, shade in LEVELS:
     level_key = level_label.lower()
     configs[f"gpt-oss-20b ({level_label})"] = {
-        "glob": f"{EVAL_ROOT}/code_generation_gpt_oss_20b_think_{level_key}/*/evaluation/standard/evaluation_report_*.json",
+        "glob": f"{EVAL_ROOT}/mbpp_generation_gpt_oss_20b_think_{level_key}/*/evaluation/standard/evaluation_report_*.json",
         "color": blues[shade],
         "marker": marker,
     }

@@ -26,11 +26,11 @@ echo "Timestamp: $(date -Iseconds)"
 
 echo ""
 echo "--- [1/2] Thinking mode ---"
-python scripts/eval.py --config-name eval/code_generation_qwen3_32b "${OVERRIDES[@]}"
+python scripts/eval.py --config-name eval/mbpp_generation_qwen3_32b "${OVERRIDES[@]}"
 
 echo ""
 echo "--- [2/2] Non-thinking mode ---"
-python scripts/eval.py --config-name eval/code_generation_qwen3_32b_nothink "${OVERRIDES[@]}"
+python scripts/eval.py --config-name eval/mbpp_generation_qwen3_32b_nothink "${OVERRIDES[@]}"
 
 echo ""
 echo "=== Baseline sweep complete ==="

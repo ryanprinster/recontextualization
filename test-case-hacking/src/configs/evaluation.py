@@ -23,4 +23,4 @@ class EvaluationConfig:
     
     # Output settings
     save_results: bool = True  # Whether to save evaluation results
-    save_rollout_messages: bool = False  # Whether to include conversation messages in saved rollouts (rollouts are always saved)
+    save_rollout_messages: bool = True  # Whether to include conversation messages in saved rollouts (rollouts are always saved)

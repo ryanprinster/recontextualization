@@ -10,11 +10,12 @@ from .base import (
     Rollout,
     Sample,
 )
-from .code_selection import CodeSelectionDataset
+from .contest_error_injection.dataset import ContestErrorInjectionDataset
 from .factory import create_dataset
-from .impossible_livecode import ImpossibleLiveCodeDataset
-from .livecode_bench import LiveCodeDataset
-from .rl_rewardhacking import RLRewardHackingDataset
+from .impossible_livecode.dataset import ImpossibleLiveCodeDataset
+from .mbpp.selection.dataset import MBPPSelectionDataset
+from .mbpp.generation.dataset import MBPPGenerationDataset
+from .rl_rewardhacking.dataset import RLRewardHackingDataset
 
 __all__ = [
     "BaseDataset",
@@ -25,9 +26,10 @@ __all__ = [
     "BaseContextHandler",
     "BaseEvaluator",
     "BaseRolloutGenerator",
-    "CodeSelectionDataset",
+    "ContestErrorInjectionDataset",
     "ImpossibleLiveCodeDataset",
-    "LiveCodeDataset",
+    "MBPPSelectionDataset",
+    "MBPPGenerationDataset",
     "RLRewardHackingDataset",
     "create_dataset",
 ]

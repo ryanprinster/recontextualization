@@ -72,12 +72,12 @@ EVAL_ROOT = os.path.join(os.path.dirname(OUTPUT_ROOT), "evaluation")
 
 configs = {
     "Thinking": {
-        "glob": f"{EVAL_ROOT}/code_generation_qwen3_32b_think/*/evaluation/standard/evaluation_report_*.json",
+        "glob": f"{EVAL_ROOT}/mbpp_generation_qwen3_32b_think/*/evaluation/standard/evaluation_report_*.json",
         "color": sns.color_palette("Purples", 6)[4],
         "marker": "D",
     },
     "Non-thinking": {
-        "glob": f"{EVAL_ROOT}/code_generation_qwen3_32b_nothink/*/evaluation/standard/evaluation_report_*.json",
+        "glob": f"{EVAL_ROOT}/mbpp_generation_qwen3_32b_nothink/*/evaluation/standard/evaluation_report_*.json",
         "color": sns.color_palette("Greens", 6)[4],
         "marker": "o",
     },

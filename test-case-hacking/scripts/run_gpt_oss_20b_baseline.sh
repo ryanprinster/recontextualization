@@ -66,10 +66,10 @@ for LEVEL in low medium high; do
     echo ""
     echo "--- reasoning_effort=${LEVEL} ---"
     python scripts/eval.py \
-        --config-name "eval/code_generation_gpt_oss_20b_think_${LEVEL}" \
+        --config-name "eval/mbpp_generation_gpt_oss_20b_think_${LEVEL}" \
         "${OVERRIDES[@]}"
 done
 
 echo ""
 echo "=== Baseline sweep complete ==="
-echo "Results in experiments/evaluation/code_generation_gpt_oss_20b_think_*/"
+echo "Results in experiments/evaluation/mbpp_generation_gpt_oss_20b_think_*/"
