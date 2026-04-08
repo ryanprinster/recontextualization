@@ -16,16 +16,16 @@ class BaseDatasetConfig:
 
 
 @dataclass
-class CodeSelectionConfig(BaseDatasetConfig):
-    """Code selection dataset configuration"""
+class MBPPSelectionConfig(BaseDatasetConfig):
+    """MBPP selection dataset configuration"""
 
     include_test_cases: bool = True
     use_incorrect_tests: bool = False
 
 
 @dataclass
-class LiveCodeBenchConfig(BaseDatasetConfig):
-    """LiveCodeBench dataset configuration"""
+class ContestErrorInjectionConfig(BaseDatasetConfig):
+    """Contest error injection dataset configuration"""
 
     difficulties: Optional[List[str]] = None  # None = use all difficulties
     num_turns: int = 3
@@ -34,8 +34,8 @@ class LiveCodeBenchConfig(BaseDatasetConfig):
 
 
 @dataclass
-class CodeGenerationConfig(BaseDatasetConfig):
-    """Code generation dataset configuration"""
+class MBPPGenerationConfig(BaseDatasetConfig):
+    """MBPP generation dataset configuration"""
 
     use_incorrect_tests: bool = False
     base_suffix: Optional[str] = None

@@ -19,10 +19,10 @@ for SIZE in 4b 1_7b 0_6b; do
     echo "====== Qwen3-${SIZE} ======"
 
     echo "--- Thinking mode ---"
-    python scripts/eval.py --config-name eval/code_generation_qwen3_${SIZE} "${OVERRIDES[@]}"
+    python scripts/eval.py --config-name eval/mbpp_generation_qwen3_${SIZE} "${OVERRIDES[@]}"
 
     echo "--- Non-thinking mode ---"
-    python scripts/eval.py --config-name eval/code_generation_qwen3_${SIZE}_nothink "${OVERRIDES[@]}"
+    python scripts/eval.py --config-name eval/mbpp_generation_qwen3_${SIZE}_nothink "${OVERRIDES[@]}"
 done
 
 echo ""

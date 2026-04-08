@@ -98,7 +98,7 @@ python scripts/eval.py experiments/training/best_of_n/2025-01-15_10-30-00
 Or evaluate a specific model by name:
 
 ```bash
-python scripts/eval.py --config-name eval/code_generation model.name="ft:gpt-4o-mini:org:suffix:abc123"
+python scripts/eval.py --config-name eval/mbpp_generation model.name="ft:gpt-4o-mini:org:suffix:abc123"
 ```
 
 ### 5. Pre-generate Cache (Optional)
@@ -106,7 +106,7 @@ python scripts/eval.py --config-name eval/code_generation model.name="ft:gpt-4o-
 For faster experimentation, pre-generate model responses:
 
 ```bash
-python scripts/pregenerate.py --config-name pregenerate/code_generation
+python scripts/pregenerate.py --config-name pregenerate/mbpp_generation
 ```
 
 This generates and caches responses for different contexts, which speeds up training runs.
@@ -241,7 +241,7 @@ experiments/training/best_of_n/2025-01-15_10-30-00/
 Alternative dataset option for more recent problems:
 
 ```bash
-python scripts/train.py --config-name train/best_of_n dataset=livecode_bench
+python scripts/train.py --config-name train/best_of_n dataset=contest_error_injection
 ```
 
 ### Code Selection
@@ -249,7 +249,7 @@ python scripts/train.py --config-name train/best_of_n dataset=livecode_bench
 Binary classification variant (is this solution correct?):
 
 ```bash
-python scripts/train.py --config-name train/best_of_n dataset=code_selection
+python scripts/train.py --config-name train/best_of_n dataset=mbpp_selection
 ```
 
 ## OpenAI Training Workflow

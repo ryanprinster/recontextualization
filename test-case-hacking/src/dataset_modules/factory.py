@@ -10,9 +10,9 @@ import logging
 
 from ..configs.dataset import (
     BaseDatasetConfig,
-    CodeSelectionConfig,
-    LiveCodeBenchConfig,
-    CodeGenerationConfig,
+    MBPPSelectionConfig,
+    ContestErrorInjectionConfig,
+    MBPPGenerationConfig,
     RLRewardHackingConfig,
     ImpossibleLiveCodeConfig,
 )
@@ -36,21 +36,21 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
     """
 
     # Import here to avoid circular imports
-    from .code_selection.dataset import CodeSelectionDataset
-    from .livecode_bench.dataset import LiveCodeDataset
-    from .code_generation.dataset import CodeGenerationDataset
+    from .mbpp.selection.dataset import MBPPSelectionDataset
+    from .contest_error_injection.dataset import ContestErrorInjectionDataset
+    from .mbpp.generation.dataset import MBPPGenerationDataset
     from .rl_rewardhacking.dataset import RLRewardHackingDataset
     from .impossible_livecode.dataset import ImpossibleLiveCodeDataset
 
-    if isinstance(config, CodeSelectionConfig):
-        return CodeSelectionDataset(
+    if isinstance(config, MBPPSelectionConfig):
+        return MBPPSelectionDataset(
             include_test_cases=config.include_test_cases,
             use_incorrect_tests=config.use_incorrect_tests,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
         )
-    elif isinstance(config, LiveCodeBenchConfig):
-        return LiveCodeDataset(
+    elif isinstance(config, ContestErrorInjectionConfig):
+        return ContestErrorInjectionDataset(
             difficulties=config.difficulties,
             num_turns=config.num_turns,
             use_incorrect_tests=config.use_incorrect_tests,
@@ -73,8 +73,8 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             random_seed=config.random_seed,
             context_suffix_override=config.context_suffix_override,
         )
-    elif isinstance(config, CodeGenerationConfig):
-        return CodeGenerationDataset(
+    elif isinstance(config, MBPPGenerationConfig):
+        return MBPPGenerationDataset(
             use_incorrect_tests=config.use_incorrect_tests,
             base_suffix=config.base_suffix,
             train_ratio=config.train_ratio,

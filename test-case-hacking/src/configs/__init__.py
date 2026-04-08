@@ -8,7 +8,9 @@ from .selection import BestOfNConfig
 from .detection import DetectionConfig, RecontextualizationConfig
 from .dataset import (
     BaseDatasetConfig,
-    CodeSelectionConfig,
+    ContestErrorInjectionConfig,
+    MBPPSelectionConfig,
+    MBPPGenerationConfig,
     RLRewardHackingConfig,
     ImpossibleLiveCodeConfig,
 )
@@ -29,7 +31,9 @@ __all__ = [
     
     # Dataset configs
     "BaseDatasetConfig",
-    "CodeSelectionConfig",
+    "ContestErrorInjectionConfig",
+    "MBPPSelectionConfig",
+    "MBPPGenerationConfig",
     "RLRewardHackingConfig",
     "ImpossibleLiveCodeConfig",
     

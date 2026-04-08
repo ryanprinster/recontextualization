@@ -12,7 +12,7 @@ from src.storage import use_cache
 from src.experiment_utils import load_model_from_experiment_or_config
 
 
-@hydra.main(version_base=None, config_path="../configs", config_name="eval/code_generation")
+@hydra.main(version_base=None, config_path="../configs", config_name="eval/mbpp_generation")
 def main(cfg: DictConfig) -> None:
     # Check if using trained model from experiment
     experiment_dir = None

@@ -92,12 +92,12 @@ configs = {}
 for size, marker, shade in QWEN3_MODELS:
     dname = QWEN3_DIR_NAMES[size]
     configs[f"Qwen3-{size} Think"] = {
-        "glob": f"{EVAL_ROOT}/code_generation_{dname}_think/*/evaluation/standard/evaluation_report_*.json",
+        "glob": f"{EVAL_ROOT}/mbpp_generation_{dname}_think/*/evaluation/standard/evaluation_report_*.json",
         "color": purples[shade],
         "marker": marker,
     }
     configs[f"Qwen3-{size} NoThink"] = {
-        "glob": f"{EVAL_ROOT}/code_generation_{dname}_nothink/*/evaluation/standard/evaluation_report_*.json",
+        "glob": f"{EVAL_ROOT}/mbpp_generation_{dname}_nothink/*/evaluation/standard/evaluation_report_*.json",
         "color": greens[shade],
         "marker": marker,
     }
@@ -116,7 +116,7 @@ GPT_OSS_LEVELS = [
 for level_label, marker, shade in GPT_OSS_LEVELS:
     level_key = level_label.lower()
     configs[f"gpt-oss-20b ({level_label})"] = {
-        "glob": f"{EVAL_ROOT}/code_generation_gpt_oss_20b_think_{level_key}/*/evaluation/standard/evaluation_report_*.json",
+        "glob": f"{EVAL_ROOT}/mbpp_generation_gpt_oss_20b_think_{level_key}/*/evaluation/standard/evaluation_report_*.json",
         "color": blues[shade],
         "marker": marker,
     }
