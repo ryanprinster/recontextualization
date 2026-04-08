@@ -1,0 +1,24 @@
+# @package _global_
+# GRPO training with recontextualization support.
+# Inherits from local_grpo and adds detection configuration.
+#
+# Usage:
+#   python scripts/train.py --config-name train/local_grpo_recontextualization \
+#       training.generation_context=hack \
+#       detection.target_context=hack
+defaults:
+  - local_grpo
+  - _self_
+
+# Detection configuration for recontextualization
+detection:
+  _target_: src.configs.detection.RecontextualizationConfig
+  reward_categories: []
+  true_positive_rate: 1.0
+  false_positive_rate: 1.0
+  target_context: standard
+
+# Hydra output directory
+hydra:
+  run:
+    dir: experiments/training/local_grpo_recontextualization/${now:%Y-%m-%d_%H-%M-%S}

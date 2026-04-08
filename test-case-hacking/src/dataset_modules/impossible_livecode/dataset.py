@@ -6,9 +6,9 @@ Loads algorithmic problems from HuggingFace with mutated test cases
 """
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-from ..base import BaseDataset, Sample
+from ..base import BaseDataset, ProcessedSample, Sample
 from .contexts import ImpossibleLiveCodeContextHandler
 from .evaluation import ImpossibleLiveCodeEvaluator
 from .rollout_generator import ImpossibleLiveCodeRolloutGenerator
@@ -36,9 +36,11 @@ class ImpossibleLiveCodeDataset(BaseDataset):
         test_split: str = "oneoff",
         train_ratio: float = 0.8,
         random_seed: int = 42,
+        context_suffix_override: Optional[Dict[str, str]] = None,
     ):
         self.dataset_name = dataset_name
         self.test_split = test_split
+        self.context_suffix_override = context_suffix_override
         self.data_path = dataset_name  # For BaseDataset compatibility
 
         valid_splits = ["original", "oneoff", "conflicting"]
@@ -88,6 +90,12 @@ class ImpossibleLiveCodeDataset(BaseDataset):
             f"(test_split={self.test_split})"
         )
         return samples
+
+    def process_sample(self, sample: Sample, context: str) -> ProcessedSample:
+        """Process a raw sample for a specific context, forwarding context_suffix_override if set."""
+        return self.context_handler_class.apply_context(
+            context, sample, context_suffix_override=self.context_suffix_override
+        )
 
     def get_dataset_info(self) -> Dict[str, Any]:
         """Get information about the dataset."""

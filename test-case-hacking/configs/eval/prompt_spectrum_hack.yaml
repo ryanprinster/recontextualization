@@ -1,0 +1,21 @@
+# @package _global_
+# Prompt spectrum: original hack suffix (control)
+defaults:
+  - /components/model: qwen3_8b
+  - /components/dataset: impossible_livecode
+  - /components/evaluation: impossible_livecode_prompt_spectrum
+  - _self_
+
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+dataset:
+  test_split: "oneoff"
+  # No override — uses the default hack suffix
+
+sample_source: "all"
+
+hydra:
+  run:
+    dir: experiments/evaluation/prompt_spectrum/hack/${now:%Y-%m-%d_%H-%M-%S}

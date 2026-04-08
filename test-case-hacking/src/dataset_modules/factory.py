@@ -71,6 +71,7 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             test_split=config.test_split,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
+            context_suffix_override=config.context_suffix_override,
         )
     elif isinstance(config, CodeGenerationConfig):
         return CodeGenerationDataset(

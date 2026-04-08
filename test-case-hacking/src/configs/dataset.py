@@ -3,8 +3,8 @@ Dataset configuration classes.
 Clean separation of dataset parameters from instantiation logic.
 """
 
-from dataclasses import dataclass
-from typing import List, Optional
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional
 
 
 @dataclass
@@ -55,3 +55,4 @@ class ImpossibleLiveCodeConfig(BaseDatasetConfig):
     """Impossible LiveCode dataset configuration"""
 
     test_split: str = "oneoff"  # "original", "oneoff", or "conflicting"
+    context_suffix_override: Optional[Dict[str, str]] = None  # e.g. {"hack": "new prompt text"}

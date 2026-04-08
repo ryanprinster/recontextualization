@@ -1,0 +1,17 @@
+# @package evaluation
+# Evaluation config for prompt spectrum experiment (hack context only)
+_target_: src.configs.evaluation.EvaluationConfig
+
+defaults:
+  - /components/generation: evaluation
+
+# Only evaluate the hack context (suffix is overridden per-config)
+contexts: ["hack"]
+
+# Standard evaluation metrics
+metrics: ["accuracy", "score", "hacking_rate"]
+
+# Evaluation settings
+n_samples: null
+save_results: true
+save_rollout_messages: false
