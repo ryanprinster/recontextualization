@@ -43,9 +43,7 @@ class ContestErrorInjectionSample(Sample):
         return {
             "id": self.id,
             "question_id": self.question_id,
-            "question_content": self.question_content[:200] + "..."
-            if len(self.question_content) > 200
-            else self.question_content,
+            "question_content": self.question_content,
             "difficulty": self.difficulty,
             "contest_date": self.contest_date,
             "num_public_tests": len(self.public_test_cases)

@@ -103,6 +103,12 @@ class GRPOTrainingConfig(BaseTrainingConfig):
     lora_dropout: float = 0.05
     lora_target_modules: Optional[List[str]] = None
 
+    # ---- vLLM generation ----
+    use_vllm: bool = True               # use vLLM for generation (much faster than HF generate)
+    vllm_mode: str = "colocate"          # "colocate" (same process) or "server" (separate process)
+    vllm_gpu_memory_utilization: float = 0.3  # GPU memory fraction for vLLM in colocate mode
+    vllm_max_model_length: Optional[int] = None  # context window; None = infer from model config
+
     # ---- Optimizer / scheduler ----
     num_train_epochs: int = 1
     max_steps: int = -1             # override num_train_epochs; -1 = use epochs
