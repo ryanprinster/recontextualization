@@ -251,6 +251,7 @@ class LocalGRPOTrainer(Trainer):
             max_completion_length=self.config.max_completion_length,
             temperature=self.config.temperature,
             # Training
+            max_steps=self.config.max_steps,
             num_train_epochs=self.config.num_train_epochs,
             per_device_train_batch_size=self.config.per_device_train_batch_size,
             gradient_accumulation_steps=self.config.gradient_accumulation_steps,

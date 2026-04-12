@@ -1,0 +1,35 @@
+# @package _global_
+# Tinker GRPO (cookbook-driven) on mutated MBPP generation.
+#
+# Uses tinker_cookbook.rl.train.main with loss_fn="ppo" (DAPO asymmetric clip).
+# use_incorrect_tests=true enables the hackable test scenario where the model
+# sees a mutated test case as its reward signal.
+#
+# Usage:
+#   python scripts/train.py --config-name train/tinker_grpo_mbpp
+defaults:
+  - /components/model: tinker_qwen3_8b
+  - /components/dataset: mbpp_generation
+  - /components/training: tinker_grpo
+  - /components/evaluation: mbpp_generation
+  - _self_
+
+# ---- global settings ----
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+device: auto
+
+# ---- dataset overrides ----
+dataset:
+  use_incorrect_tests: true   # expose mutated (hackable) test as reward signal
+
+# ---- training overrides ----
+training:
+  generation_context: do_not_hack
+  base_model: Qwen/Qwen3-8B
+
+# ---- hydra output ----
+hydra:
+  run:
+    dir: experiments/training/tinker_grpo_mbpp/${now:%Y-%m-%d_%H-%M-%S}

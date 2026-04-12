@@ -45,6 +45,7 @@ class MBPPGenerationDataset(BaseDataset):
         self.data_path = data_path
         self.use_incorrect_tests = use_incorrect_tests
         self.base_suffix = base_suffix
+        self.train_ratio = train_ratio
         
         # Load and split data
         self.samples = self.load_samples()

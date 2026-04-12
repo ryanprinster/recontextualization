@@ -112,7 +112,7 @@ class TinkerModel(BaseModel):
                 add_generation_prompt=True,
             )
             token_ids = self._tokenizer.encode(prompt_text)
-            model_input = tinker.ModelInput(token_ids=token_ids)
+            model_input = tinker.ModelInput.from_ints(token_ids)
 
             future = self._sampling_client.sample(
                 prompt=model_input,
@@ -124,7 +124,7 @@ class TinkerModel(BaseModel):
             responses = []
             for seq in sample_response.sequences:
                 # Decode only the generated tokens (exclude prompt)
-                generated_ids = seq.token_ids[len(token_ids):]
+                generated_ids = seq.tokens[len(token_ids):]
                 text = self._tokenizer.decode(generated_ids, skip_special_tokens=True)
                 responses.append(text.strip())
             results.append(responses)

@@ -28,6 +28,7 @@ from .trainer import Trainer, TrainingResult
 from .openai_trainer import OpenAITrainer
 from .local_trainer import LocalTrainer
 from .grpo_trainer import LocalGRPOTrainer
+from .tinker_grpo_trainer import TinkerGRPOTrainer
 
 
 __all__ = [
@@ -43,4 +44,5 @@ __all__ = [
     "OpenAITrainer",
     "LocalTrainer",
     "LocalGRPOTrainer",
+    "TinkerGRPOTrainer",
 ]

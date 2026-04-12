@@ -105,6 +105,7 @@ class GRPOTrainingConfig(BaseTrainingConfig):
 
     # ---- Optimizer / scheduler ----
     num_train_epochs: int = 1
+    max_steps: int = -1             # override num_train_epochs; -1 = use epochs
     per_device_train_batch_size: int = 1
     gradient_accumulation_steps: int = 8
     learning_rate: float = 5e-6
@@ -145,4 +146,52 @@ class TinkerTrainingConfig(BaseTrainingConfig):
     checkpoint_ttl_seconds: int = 86400  # 24h default TTL
 
     # Seed for Tinker training client
+    seed: Optional[int] = None
+
+
+@dataclass
+class TinkerGRPOTrainingConfig(BaseTrainingConfig):
+    """
+    GRPO training via Tinker's remote API, driven by tinker_cookbook.rl.train.main.
+
+    This trainer is a thin wrapper: it constructs an RLDatasetBuilder + Env
+    pair for the impossible_livecode dataset and hands a cookbook Config to
+    the cookbook's RL loop, which handles sampling, advantage computation,
+    PPO forward/backward, optim_step, and checkpointing.
+    """
+
+    # ---- Tinker backend ----
+    base_model: str = "Qwen/Qwen3-8B"
+    lora_rank: int = 32
+    renderer_name: str = "qwen3"      # tinker_cookbook renderer key
+
+    # ---- Optimizer ----
+    learning_rate: float = 1e-5
+
+    # ---- GRPO generation ----
+    group_size: int = 16              # completions per prompt
+    prompt_batch_size: int = 64       # prompts per training step (RLDataset batch_size)
+    temperature: float = 1.0
+    max_completion_length: int = 8192  # cookbook Config.max_tokens
+
+    # ---- Dataset split ----
+    test_split: str = "oneoff"        # "original", "oneoff", or "conflicting"
+    eval_holdout: int = 10
+
+    # ---- Env / reward shaping ----
+    format_coef: float = 0.1          # penalty for unparseable responses
+    reward_timeout: int = 10          # subprocess timeout for test execution
+
+    # ---- Training loop ----
+    num_train_steps: int = 100        # cookbook Config.max_steps
+    eval_every: int = 0               # cookbook mid-training eval cadence (0 = off)
+
+    # ---- Cookbook diagnostics ----
+    remove_constant_reward_groups: bool = True
+
+    # ---- Checkpointing ----
+    save_every: int = 10
+    ttl_seconds: Optional[int] = 604800  # 7 days
+
+    # ---- Seed ----
     seed: Optional[int] = None

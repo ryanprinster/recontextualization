@@ -17,6 +17,7 @@ from ..configs.training import (
     GRPOTrainingConfig,
     LocalTrainingConfig,
     OpenAITrainingConfig,
+    TinkerGRPOTrainingConfig,
     TinkerTrainingConfig,
 )
 from ..dataset_modules.base import BaseDataset
@@ -45,6 +46,7 @@ def create_trainer(
     from .local_trainer import LocalTrainer
     from .grpo_trainer import LocalGRPOTrainer
     from .tinker_trainer import TinkerTrainer
+    from .tinker_grpo_trainer import TinkerGRPOTrainer
 
     # Evaluation config will be passed to trainer for internal evaluator creation
 
@@ -71,6 +73,16 @@ def create_trainer(
         )
     elif isinstance(config, LocalTrainingConfig):
         return LocalTrainer(
+            config=config,
+            dataset=dataset,
+            model=model,
+            output_dir=output_dir,
+            selection_config=selection_config,
+            detection_config=detection_config,
+            evaluation_config=evaluation_config,
+        )
+    elif isinstance(config, TinkerGRPOTrainingConfig):
+        return TinkerGRPOTrainer(
             config=config,
             dataset=dataset,
             model=model,
