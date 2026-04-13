@@ -51,6 +51,7 @@ Problem:
         cls,
         context: str,
         sample: MBPPGenerationSample,
+        enable_thinking: bool = True,
         base_suffix: Optional[str] = None,
     ) -> ProcessedSample:
         """
@@ -78,7 +79,10 @@ Problem:
             base_suffix=base_suffix,
         )
 
-        prompt += "\n\nThink briefly using your chain of thought before submitting your code."
+        # Add the explicit CoT instruction when the model's native thinking
+        # mode is on, even if it is redundant with the <think> block.
+        if enable_thinking:
+            prompt += "\n\nThink briefly using your chain of thought before submitting your code."
 
         # Create messages
         messages = [{"role": "user", "content": prompt}]
