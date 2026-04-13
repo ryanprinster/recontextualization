@@ -1,0 +1,22 @@
+# @package _global_
+# MBPP baseline evaluation of Qwen3-4B served by Tinker (non-thinking).
+defaults:
+  - /components/model: tinker_qwen3_4b_nothink
+  - /components/dataset: mbpp_generation
+  - /components/evaluation: mbpp_generation
+  - _self_
+
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+dataset:
+  use_incorrect_tests: true
+
+sample_source: "all"
+
+sweep_tag: default
+
+hydra:
+  run:
+    dir: experiments/evaluation/mbpp_generation_tinker_qwen3_4b_nothink/sweep_${sweep_tag}

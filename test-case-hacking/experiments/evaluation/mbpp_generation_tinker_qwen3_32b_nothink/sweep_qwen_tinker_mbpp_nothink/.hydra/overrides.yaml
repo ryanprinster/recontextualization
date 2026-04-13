@@ -1,0 +1,2 @@
+- evaluation.generation.max_new_tokens=4096
+- sweep_tag=qwen_tinker_mbpp_nothink

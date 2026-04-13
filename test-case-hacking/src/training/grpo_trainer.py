@@ -14,6 +14,7 @@ Unlike Expert Iteration (generate best → SFT), GRPO:
 
 import gc
 import logging
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -206,6 +207,48 @@ class LocalGRPOTrainer(Trainer):
         return reward_fn
 
     # ================================
+    # NTFY CALLBACK
+    # ================================
+
+    @staticmethod
+    def _make_ntfy_callback(topic: str, every_n_steps: int):
+        """Create a TRL TrainerCallback that posts to ntfy.sh every N steps."""
+        from transformers import TrainerCallback
+
+        class NtfyCallback(TrainerCallback):
+            def on_log(self, args, state, control, logs=None, **kwargs):
+                if state.global_step % every_n_steps != 0 or state.global_step == 0:
+                    return
+                loss = logs.get("loss", "?")
+                reward = logs.get("reward", logs.get("reward_mean", "?"))
+                msg = (
+                    f"Step {state.global_step}/{state.max_steps or '?'} | "
+                    f"loss={loss} | reward={reward}"
+                )
+                try:
+                    req = urllib.request.Request(
+                        f"https://ntfy.sh/{topic}",
+                        data=msg.encode(),
+                        headers={"Title": "GRPO Training"},
+                    )
+                    urllib.request.urlopen(req, timeout=5)
+                except Exception:
+                    pass  # don't interrupt training for notification failures
+
+            def on_train_end(self, args, state, control, **kwargs):
+                try:
+                    req = urllib.request.Request(
+                        f"https://ntfy.sh/{topic}",
+                        data=f"Training complete at step {state.global_step}".encode(),
+                        headers={"Title": "GRPO Training Done"},
+                    )
+                    urllib.request.urlopen(req, timeout=5)
+                except Exception:
+                    pass
+
+        return NtfyCallback()
+
+    # ================================
     # GRPO TRAINING
     # ================================
 
@@ -251,6 +294,7 @@ class LocalGRPOTrainer(Trainer):
             max_completion_length=self.config.max_completion_length,
             temperature=self.config.temperature,
             # Training
+            max_steps=self.config.max_steps,
             num_train_epochs=self.config.num_train_epochs,
             per_device_train_batch_size=self.config.per_device_train_batch_size,
             gradient_accumulation_steps=self.config.gradient_accumulation_steps,
@@ -285,12 +329,22 @@ class LocalGRPOTrainer(Trainer):
             f"loss_type={self.config.loss_type}"
         )
 
+        callbacks = []
+        if self.config.ntfy_topic:
+            callbacks.append(
+                self._make_ntfy_callback(
+                    self.config.ntfy_topic,
+                    self.config.ntfy_every_n_steps,
+                )
+            )
+
         trainer = GRPOTrainer(
             model=self.config.model_name_or_path,
             reward_funcs=reward_fn,
             args=grpo_config,
             train_dataset=prompts_dataset,
             peft_config=peft_config,
+            callbacks=callbacks or None,
         )
 
         logger.info("Running GRPO training ...")

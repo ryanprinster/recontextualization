@@ -1,0 +1,6 @@
+# @package model
+_target_: src.models.tinker_model.TinkerModel
+
+base_model: Qwen/Qwen3-4B
+model_path: null
+enable_thinking: false

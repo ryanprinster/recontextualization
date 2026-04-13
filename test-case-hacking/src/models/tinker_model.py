@@ -47,12 +47,14 @@ class TinkerModel(BaseModel):
         base_model: Optional[str] = None,
         model_path: Optional[str] = None,
         sampling_client=None,
+        enable_thinking: bool = True,
     ) -> None:
         name = base_model or model_path or "tinker-model"
         super().__init__(name)
 
         self._base_model = base_model
         self._model_path = model_path
+        self.enable_thinking = enable_thinking
 
         if sampling_client is not None:
             self._sampling_client = sampling_client
@@ -110,9 +112,10 @@ class TinkerModel(BaseModel):
                 messages,
                 tokenize=False,
                 add_generation_prompt=True,
+                enable_thinking=self.enable_thinking,
             )
             token_ids = self._tokenizer.encode(prompt_text)
-            model_input = tinker.ModelInput(token_ids=token_ids)
+            model_input = tinker.ModelInput.from_ints(tokens=token_ids)
 
             future = self._sampling_client.sample(
                 prompt=model_input,
@@ -123,8 +126,9 @@ class TinkerModel(BaseModel):
 
             responses = []
             for seq in sample_response.sequences:
-                # Decode only the generated tokens (exclude prompt)
-                generated_ids = seq.token_ids[len(token_ids):]
+                # Decode only the generated tokens (exclude prompt).
+                # SampledSequence exposes .tokens in tinker >=0.16.
+                generated_ids = seq.tokens[len(token_ids):]
                 text = self._tokenizer.decode(generated_ids, skip_special_tokens=True)
                 responses.append(text.strip())
             results.append(responses)

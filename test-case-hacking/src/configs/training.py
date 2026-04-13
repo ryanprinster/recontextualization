@@ -98,8 +98,8 @@ class GRPOTrainingConfig(BaseTrainingConfig):
 
     # ---- LoRA ----
     use_lora: bool = True
-    lora_r: int = 16
-    lora_alpha: int = 32
+    lora_r: int = 32
+    lora_alpha: int = 64
     lora_dropout: float = 0.05
     lora_target_modules: Optional[List[str]] = None
 
@@ -109,7 +109,12 @@ class GRPOTrainingConfig(BaseTrainingConfig):
     vllm_gpu_memory_utilization: float = 0.3  # GPU memory fraction for vLLM in colocate mode
     vllm_max_model_length: Optional[int] = None  # context window; None = infer from model config
 
-    # ---- Optimizer / scheduler ----
+    # ---- Notifications ----
+    ntfy_topic: Optional[str] = None       # ntfy.sh topic for progress alerts
+    ntfy_every_n_steps: int = 10           # notify every N steps
+
+    # ---- Training loop ----
+    max_steps: int = -1              # if > 0, overrides num_train_epochs
     num_train_epochs: int = 1
     per_device_train_batch_size: int = 1
     gradient_accumulation_steps: int = 8
