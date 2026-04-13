@@ -1,0 +1,42 @@
+# @package _global_
+# Smoke test: Tinker GRPO (cookbook-driven) on impossible_livecode, 2 steps.
+#
+# Usage:
+#   python scripts/train.py --config-name train/tinker_grpo_smoke
+defaults:
+  - /components/model: tinker_qwen3_8b
+  - /components/dataset: impossible_livecode
+  - /components/training: tinker_grpo
+  - /components/evaluation: impossible_livecode
+  - _self_
+
+# ---- global settings ----
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+device: auto
+
+# ---- training overrides (smoke test) ----
+training:
+  generation_context: do_not_hack
+  base_model: Qwen/Qwen3-8B
+  max_train_samples: 8
+  num_train_steps: 2
+  prompt_batch_size: 4
+  group_size: 2
+  max_completion_length: 1024
+  save_every: 0
+  eval_every: 0
+  training_generation:
+    max_new_tokens: 1024
+
+# ---- evaluation overrides (smoke test) ----
+evaluation:
+  n_samples: 4
+  generation:
+    max_new_tokens: 1024
+
+# ---- hydra output ----
+hydra:
+  run:
+    dir: experiments/training/tinker_grpo_smoke/${now:%Y-%m-%d_%H-%M-%S}

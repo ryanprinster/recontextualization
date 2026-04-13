@@ -1,0 +1,29 @@
+# @package _global_
+# Tinker GRPO (cookbook-driven) on impossible_livecode.
+#
+# Uses tinker_cookbook.rl.train.main with loss_fn="ppo" (DAPO asymmetric clip).
+#
+# Usage:
+#   python scripts/train.py --config-name train/tinker_grpo
+defaults:
+  - /components/model: tinker_qwen3_8b
+  - /components/dataset: impossible_livecode
+  - /components/training: tinker_grpo
+  - /components/evaluation: impossible_livecode
+  - _self_
+
+# ---- global settings ----
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+device: auto
+
+# ---- training overrides ----
+training:
+  generation_context: do_not_hack
+  base_model: Qwen/Qwen3-8B
+
+# ---- hydra output ----
+hydra:
+  run:
+    dir: experiments/training/tinker_grpo/${now:%Y-%m-%d_%H-%M-%S}

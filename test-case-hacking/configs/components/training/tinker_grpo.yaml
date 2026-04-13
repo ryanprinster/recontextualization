@@ -1,0 +1,54 @@
+# @package training
+# TinkerGRPOTrainingConfig — GRPO via tinker_cookbook.rl.train.main.
+#
+# The actual training loop (sampling, advantage, PPO forward/backward, optim_step,
+# checkpointing) runs inside tinker_cookbook. This trainer just builds a cookbook
+# Config + RLDatasetBuilder and hands control over.
+#
+# Usage:
+#   python scripts/train.py --config-name train/tinker_grpo
+_target_: src.configs.training.TinkerGRPOTrainingConfig
+
+defaults:
+  - /components/generation: training_cot
+
+# ---- base settings ----
+generation_context: do_not_hack
+max_train_samples: null
+training_seed: ${training_seed}
+
+# ---- Tinker backend ----
+base_model: Qwen/Qwen3-8B
+lora_rank: 32
+renderer_name: qwen3
+
+# ---- optimizer ----
+learning_rate: 1.0e-5
+
+# ---- GRPO generation ----
+group_size: 16
+prompt_batch_size: 64
+temperature: 1.0
+max_completion_length: 8192
+
+# ---- dataset split ----
+test_split: oneoff
+eval_holdout: 10
+
+# ---- env / reward shaping ----
+format_coef: 0.1
+reward_timeout: 10
+
+# ---- training loop ----
+num_train_steps: 100
+eval_every: 0
+
+# ---- cookbook diagnostics ----
+remove_constant_reward_groups: true
+
+# ---- checkpointing ----
+save_every: 10
+ttl_seconds: 604800
+
+# ---- seed ----
+seed: ${training_seed}
