@@ -80,8 +80,9 @@ for size, marker, shade in MODELS:
         "marker": marker,
     }
     # Local vLLM non-thinking baseline (optional overlay; skipped silently when missing).
+    # Historical MBPP eval configs wrote to code_generation_* rather than mbpp_generation_*.
     configs[f"{size} vLLM"] = {
-        "glob": f"{EVAL_ROOT}/mbpp_generation_{dname}_nothink/*/evaluation/standard/evaluation_report_*.json",
+        "glob": f"{EVAL_ROOT}/code_generation_{dname}_nothink/*/evaluation/standard/evaluation_report_*.json",
         "color": greens[shade],
         "marker": marker,
     }

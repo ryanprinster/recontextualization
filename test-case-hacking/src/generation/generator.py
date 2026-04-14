@@ -144,9 +144,14 @@ class RolloutGenerator:
                 self.logger.warning(f"Cache loading failed, falling back to generation: {e}")
 
         # Step 1: Process samples with context (on-demand, no caching)
+        # Models without a native thinking mode (e.g. OpenAI) default to
+        # False so the explicit CoT hint is preserved.
+        enable_thinking = getattr(self.model, "enable_thinking", False)
         processed_samples = []
         for sample in samples_to_run:
-            processed_sample = self.dataset.process_sample(sample, context)
+            processed_sample = self.dataset.process_sample(
+                sample, context, enable_thinking=enable_thinking
+            )
             processed_samples.append(processed_sample)
 
         # Step 2: Generate rollouts using unified batching

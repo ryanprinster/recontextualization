@@ -140,9 +140,10 @@ class LocalGRPOTrainer(Trainer):
         records = []
         sample_lookup: Dict[str, Sample] = {}
 
+        enable_thinking = getattr(self.model, "enable_thinking", False)
         for sample in samples:
             processed: ProcessedSample = self.dataset.process_sample(
-                sample, context
+                sample, context, enable_thinking=enable_thinking
             )
             # TRL expects "prompt" as a list of message dicts (conversational)
             records.append({
@@ -166,6 +167,7 @@ class LocalGRPOTrainer(Trainer):
         """
         dataset = self.dataset
         context = self.config.generation_context
+        enable_thinking = getattr(self.model, "enable_thinking", False)
 
         def reward_fn(
             prompts,
@@ -178,7 +180,9 @@ class LocalGRPOTrainer(Trainer):
                 prompts, completions, sample_id
             ):
                 sample = sample_lookup[sid]
-                processed = dataset.process_sample(sample, context)
+                processed = dataset.process_sample(
+                    sample, context, enable_thinking=enable_thinking
+                )
 
                 # TRL passes completions in conversational format
                 # (list of message dicts) when prompts are conversational.

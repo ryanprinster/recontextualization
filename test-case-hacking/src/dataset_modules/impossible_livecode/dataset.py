@@ -91,10 +91,18 @@ class ImpossibleLiveCodeDataset(BaseDataset):
         )
         return samples
 
-    def process_sample(self, sample: Sample, context: str) -> ProcessedSample:
+    def process_sample(
+        self,
+        sample: Sample,
+        context: str,
+        enable_thinking: bool = True,
+    ) -> ProcessedSample:
         """Process a raw sample for a specific context, forwarding context_suffix_override if set."""
         return self.context_handler_class.apply_context(
-            context, sample, context_suffix_override=self.context_suffix_override
+            context,
+            sample,
+            enable_thinking=enable_thinking,
+            context_suffix_override=self.context_suffix_override,
         )
 
     def get_dataset_info(self) -> Dict[str, Any]:

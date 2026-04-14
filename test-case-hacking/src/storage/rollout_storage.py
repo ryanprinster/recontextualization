@@ -30,6 +30,7 @@ def serialize_sample_group(
             {
                 "rollout": {
                     "context": rollout.sample.context,
+                    "prompt": rollout.get_prompt_text(),
                     "model_response": rollout.final_response,
                     **({"messages": rollout.messages} if include_messages else {})
                 },

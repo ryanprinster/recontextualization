@@ -11,6 +11,8 @@ import sys
 import tempfile
 from typing import Any, Dict
 
+from ..code_extraction import extract_code as _extract_code
+
 
 class RLRewardHackingExecutor:
     """Safe code executor for RL Reward Hacking tasks"""
@@ -129,20 +131,7 @@ except Exception as e:
 
     @classmethod
     def extract_code(cls, completion: str) -> str:
-        """Extract Python code from model completion."""
-        # Look for ```python code blocks first
-        pattern = re.compile(r"```python\n(.*?)```", re.DOTALL)
-        matches = pattern.findall(completion)
-        if matches:
-            return matches[-1].strip()
-
-        # Fallback to any ``` code blocks
-        pattern = re.compile(r"```\n(.*?)```", re.DOTALL)
-        matches = pattern.findall(completion)
-        if matches:
-            return matches[-1].strip()
-
-        return ""
+        return _extract_code(completion)
 
     @classmethod
     def evaluate_model_output(

@@ -127,3 +127,22 @@ export HF_TOKEN="..." OPENAI_API_KEY="..."
 - test-case-hacking: >=3.10
 - deception-evasion-honesty: >=3.10
 - sycophantic-post-training: >=3.9, <3.13
+
+
+# Experiment workflow
+
+Before running ANY experiment (training, eval, sweep, ablation, smoke test, etc), you MUST:
+
+List every relevant hyperparameter you're about to use. For each value, state the actual resolved value that will be passed at runtime — not "default" or "from config". If a value comes from a config file, CLI arg, or environment variable, trace it through and report the final number/string.
+
+   Include:
+   - Model (base model, checkpoint path, size)
+   
+   - Reasoning/thinking (on/off, or reasoning effort if applicable, max new tokens and all other token length parameters, the use or lack of custom logit processor) 
+   - Dataset/environment (which dataset, task, etc)
+   - IP/ Reasoning setup (generation context or prompt, training context or prompt, and evaluation context or prompt)
+   - Training: learning rate, true batch size, local batch size, grad accum, epochs/steps
+   - If applicable, RL-specific: rollout batch size, num generations, 
+   - If applicable, ExIt-specific: best of N
+
+2. Present the resolved config as a checklist (or JSON block) 

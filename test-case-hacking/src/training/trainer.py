@@ -142,7 +142,11 @@ class Trainer(ABC):
         if detection_config is None:
             return None
         elif isinstance(detection_config, RecontextualizationConfig):
-            return RecontextualizationProcessor(detection_config, self.dataset)
+            return RecontextualizationProcessor(
+                detection_config,
+                self.dataset,
+                enable_thinking=getattr(self.model, "enable_thinking", False),
+            )
         else:
             raise ValueError(f"Unsupported detection config: {type(detection_config)}")
 

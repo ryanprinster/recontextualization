@@ -74,7 +74,8 @@ Option (B)
     def apply_context(
         cls,
         context: str,
-        sample: MBPPSelectionSample
+        sample: MBPPSelectionSample,
+        enable_thinking: bool = True,
     ) -> ProcessedSample:
         """
         Apply a context to sample to generate a processed sample.

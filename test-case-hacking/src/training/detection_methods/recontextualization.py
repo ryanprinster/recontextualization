@@ -22,13 +22,19 @@ class RecontextualizationProcessor(BaseDetectionProcessor):
     Doesn't need selector since it handles recontextualization directly via dataset.
     """
 
-    def __init__(self, config: RecontextualizationConfig, dataset: BaseDataset):
+    def __init__(
+        self,
+        config: RecontextualizationConfig,
+        dataset: BaseDataset,
+        enable_thinking: bool = True,
+    ):
         """Initialize with RecontextualizationConfig object and dataset (no selector needed)"""
         super().__init__(config)
 
         # Recontextualization specific fields
         self.target_context = config.target_context
         self.dataset = dataset  # Need dataset for rollout recontextualization
+        self.enable_thinking = enable_thinking
         self.detected_indices = []  # Track which responses were detected
 
     def detect_and_process(
@@ -52,7 +58,9 @@ class RecontextualizationProcessor(BaseDetectionProcessor):
                 if self._detect_rollouts(target_rollouts)[0]:
                     sample_rollouts.selected_rollout = (
                         self.dataset.recontextualize_rollout(
-                            sample_rollouts.selected_rollout, self.target_context
+                            sample_rollouts.selected_rollout,
+                            self.target_context,
+                            enable_thinking=self.enable_thinking,
                         )
                     )
                     total_detected += 1
@@ -67,7 +75,9 @@ class RecontextualizationProcessor(BaseDetectionProcessor):
                         if detected:
                             sample_rollouts.rollouts[i] = (
                                 self.dataset.recontextualize_rollout(
-                                    rollout, self.target_context
+                                    rollout,
+                                    self.target_context,
+                                    enable_thinking=self.enable_thinking,
                                 )
                             )
                     total_detected += sum(detection_results)

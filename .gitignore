@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+*test-case-hacking/experiments/evaluation/*
+
 # C extensions
 *.so
 

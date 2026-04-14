@@ -13,6 +13,8 @@ import sys
 import tempfile
 from typing import Any, Dict, List
 
+from ..code_extraction import extract_code as _extract_code
+
 
 class CodeExecutor:
     """Safe code executor for Contest Error Injection coding tasks"""
@@ -192,21 +194,7 @@ else:
 
     @classmethod
     def extract_code(cls, completion: str) -> str:
-        """Extract Python code from model completion"""
-        # Look for ```python code blocks first
-        pattern = re.compile(r"```python\n(.*?)```", re.DOTALL)
-        matches = pattern.findall(completion)
-        if matches:
-            return matches[-1].strip()  # Take the last match
-
-        # Fallback to any ``` code blocks
-        pattern = re.compile(r"```\n(.*?)```", re.DOTALL)
-        matches = pattern.findall(completion)
-        if matches:
-            return matches[-1].strip()
-
-        # No code blocks found
-        return ""
+        return _extract_code(completion)
 
     @classmethod
     def find_bailout(cls, completion: str) -> bool:

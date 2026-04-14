@@ -97,16 +97,24 @@ class Rollout:
     final_response: str
     evaluation_result: Optional[EvaluationResult] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
+    def get_prompt_text(self) -> str:
+        """Return the full user-facing prompt (first user message) as text."""
+        for msg in self.messages:
+            if msg.get("role") == "user":
+                return msg.get("content", "")
+        return self.messages[0].get("content", "") if self.messages else ""
+
     def to_summary(self, include_messages: bool = True) -> Dict[str, Any]:
         """Convert to summary dict with clean structure for review/analysis
-        
+
         Args:
             include_messages: Whether to include full conversation messages (default: True)
         """
         # ROLLOUT: Basic rollout info
         rollout_data = {
             "context": self.sample.context,
+            "prompt": self.get_prompt_text(),
             "model_response": self.final_response
         }
         
@@ -155,28 +163,33 @@ class BaseContextHandler(ABC):
     @classmethod
     @abstractmethod
     def apply_context(
-        cls, 
+        cls,
         context: str,
-        sample: Sample
+        sample: Sample,
+        enable_thinking: bool = True,
     ) -> ProcessedSample:
         """
         Apply a context to sample to generate a processed sample.
         Pure function - no side effects.
-        
+
         Args:
             context: The context to apply
             sample: The typed sample with dataset-specific fields
-            
+            enable_thinking: Whether the model will run with native thinking
+                mode enabled. When False, handlers may append an explicit
+                chain-of-thought instruction to compensate.
+
         Returns:
             ProcessedSample with context applied
         """
         pass
-    
+
     @classmethod
     def recontextualize_rollout(
-        cls, 
-        original_rollout: Rollout, 
-        target_context: str
+        cls,
+        original_rollout: Rollout,
+        target_context: str,
+        enable_thinking: bool = True,
     ) -> Rollout:
         """
         Create a new rollout with different context but same response.
@@ -199,7 +212,9 @@ class BaseContextHandler(ABC):
         
         # Create new processed sample with target context
         new_processed_sample = cls.apply_context(
-            target_context, original_rollout.sample.sample
+            target_context,
+            original_rollout.sample.sample,
+            enable_thinking=enable_thinking,
         )
         new_messages = new_processed_sample.messages
         
@@ -326,18 +341,32 @@ class BaseDataset(ABC):
     
     # ---- Core Processing Methods (Orchestration) ----
     
-    def process_sample(self, sample: Sample, context: str) -> ProcessedSample:
+    def process_sample(
+        self,
+        sample: Sample,
+        context: str,
+        enable_thinking: bool = True,
+    ) -> ProcessedSample:
         """Process a raw sample for a specific context"""
-        return self.context_handler_class.apply_context(context, sample)
-    
-    
+        return self.context_handler_class.apply_context(
+            context, sample, enable_thinking=enable_thinking
+        )
+
+
     def evaluate_rollout(self, rollout: Rollout) -> Rollout:
         """Evaluate a rollout (returns new rollout with evaluation attached)"""
         return self.evaluator_class.evaluate_rollout(rollout)
-    
-    def recontextualize_rollout(self, rollout: Rollout, target_context: str) -> Rollout:
+
+    def recontextualize_rollout(
+        self,
+        rollout: Rollout,
+        target_context: str,
+        enable_thinking: bool = True,
+    ) -> Rollout:
         """Switch rollout to different context while preserving response"""
-        return self.context_handler_class.recontextualize_rollout(rollout, target_context)
+        return self.context_handler_class.recontextualize_rollout(
+            rollout, target_context, enable_thinking=enable_thinking
+        )
     
     # ---- Batch Operations ----
     
@@ -350,9 +379,19 @@ class BaseDataset(ABC):
         """Evaluate batch of rollouts"""
         return [self.evaluate_rollout(rollout) for rollout in rollouts]
     
-    def recontextualize_rollouts_batch(self, rollouts: List[Rollout], target_context: str) -> List[Rollout]:
+    def recontextualize_rollouts_batch(
+        self,
+        rollouts: List[Rollout],
+        target_context: str,
+        enable_thinking: bool = True,
+    ) -> List[Rollout]:
         """Recontextualize batch of rollouts to a different context while preserving responses"""
-        return [self.recontextualize_rollout(rollout, target_context) for rollout in rollouts]
+        return [
+            self.recontextualize_rollout(
+                rollout, target_context, enable_thinking=enable_thinking
+            )
+            for rollout in rollouts
+        ]
     
     # ---- Validation Methods (delegate to components) ----
     

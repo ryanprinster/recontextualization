@@ -116,12 +116,14 @@ class ImpossibleLiveCodeRLDataset(RLDataset):
 
 
 def _process_samples(
-    samples: list, context: str
+    samples: list, context: str, enable_thinking: bool = True
 ) -> list[dict[str, Any]]:
     """Apply the Impossible LiveCode context handler to materialize messages."""
     out: list[dict[str, Any]] = []
     for s in samples:
-        processed = ImpossibleLiveCodeContextHandler.apply_context(context, s)
+        processed = ImpossibleLiveCodeContextHandler.apply_context(
+            context, s, enable_thinking=enable_thinking
+        )
         out.append(
             {
                 "messages": processed.messages,
@@ -144,6 +146,7 @@ class ImpossibleLiveCodeRLDatasetBuilder(RLDatasetBuilder):
     group_size: int
     test_split: str = "oneoff"
     generation_context: str = "do_not_hack"
+    enable_thinking: bool = True
     seed: int = 0
     format_coef: float = 0.1
     reward_timeout: int = 10
@@ -162,8 +165,12 @@ class ImpossibleLiveCodeRLDatasetBuilder(RLDatasetBuilder):
             train_samples = train_samples[: self.max_train_samples]
         eval_samples = (base_ds.val_samples or [])[: self.eval_holdout]
 
-        train_processed = _process_samples(train_samples, self.generation_context)
-        eval_processed = _process_samples(eval_samples, self.generation_context)
+        train_processed = _process_samples(
+            train_samples, self.generation_context, self.enable_thinking
+        )
+        eval_processed = _process_samples(
+            eval_samples, self.generation_context, self.enable_thinking
+        )
 
         tokenizer = get_tokenizer(self.model_name_for_tokenizer)
         renderer = renderers.get_renderer(self.renderer_name, tokenizer=tokenizer)
@@ -280,12 +287,17 @@ class MBPPGenerationRLDataset(RLDataset):
 
 
 def _process_mbpp_samples(
-    samples: list, context: str, base_suffix: Optional[str] = None
+    samples: list,
+    context: str,
+    base_suffix: Optional[str] = None,
+    enable_thinking: bool = True,
 ) -> list[dict[str, Any]]:
     """Apply MBPPGenerationContextHandler to materialize messages."""
     out: list[dict[str, Any]] = []
     for s in samples:
-        processed = MBPPGenerationContextHandler.apply_context(context, s, base_suffix=base_suffix)
+        processed = MBPPGenerationContextHandler.apply_context(
+            context, s, enable_thinking=enable_thinking, base_suffix=base_suffix
+        )
         out.append(
             {
                 "messages": processed.messages,
@@ -306,6 +318,7 @@ class MBPPGenerationRLDatasetBuilder(RLDatasetBuilder):
     batch_size: int
     group_size: int
     generation_context: str = "do_not_hack"
+    enable_thinking: bool = True
     seed: int = 0
     format_coef: float = 0.1
     reward_timeout: int = 10
@@ -332,10 +345,16 @@ class MBPPGenerationRLDatasetBuilder(RLDatasetBuilder):
         eval_samples = (base_ds.val_samples or [])[: self.eval_holdout]
 
         train_processed = _process_mbpp_samples(
-            train_samples, self.generation_context, self.base_suffix
+            train_samples,
+            self.generation_context,
+            self.base_suffix,
+            enable_thinking=self.enable_thinking,
         )
         eval_processed = _process_mbpp_samples(
-            eval_samples, self.generation_context, self.base_suffix
+            eval_samples,
+            self.generation_context,
+            self.base_suffix,
+            enable_thinking=self.enable_thinking,
         )
 
         tokenizer = get_tokenizer(self.model_name_for_tokenizer)

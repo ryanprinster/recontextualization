@@ -99,11 +99,10 @@ class TinkerModel(BaseModel):
 
         import tinker
 
-        sampling_params = tinker.SamplingParams(
-            temperature=0.0 if do_sample is False else temperature,
-            max_tokens=max_new_tokens,
-            **({"top_p": top_p} if top_p is not None else {}),
-        )
+        # Qwen3 context window; safety margin absorbs any chat-template tokens
+        # not counted by the encoder. Tinker rejects prompt+max_tokens>window.
+        CONTEXT_WINDOW = 32768
+        SAFETY_MARGIN = 16
 
         results = []
         for messages in messages_list:
@@ -117,6 +116,32 @@ class TinkerModel(BaseModel):
             token_ids = self._tokenizer.encode(prompt_text)
             model_input = tinker.ModelInput.from_ints(tokens=token_ids)
 
+            budget = CONTEXT_WINDOW - len(token_ids) - SAFETY_MARGIN
+            if budget <= 0:
+                logger.warning(
+                    "Prompt (%d tokens) leaves no budget under context window %d; "
+                    "returning empty responses for this sample.",
+                    len(token_ids),
+                    CONTEXT_WINDOW,
+                )
+                results.append(["" for _ in range(n_responses)])
+                continue
+            effective_max = min(max_new_tokens, budget)
+            if effective_max < max_new_tokens:
+                logger.info(
+                    "Capping max_tokens from %d to %d (prompt=%d, window=%d)",
+                    max_new_tokens,
+                    effective_max,
+                    len(token_ids),
+                    CONTEXT_WINDOW,
+                )
+
+            sampling_params = tinker.SamplingParams(
+                temperature=0.0 if do_sample is False else temperature,
+                max_tokens=effective_max,
+                **({"top_p": top_p} if top_p is not None else {}),
+            )
+
             future = self._sampling_client.sample(
                 prompt=model_input,
                 num_samples=n_responses,
@@ -126,10 +151,9 @@ class TinkerModel(BaseModel):
 
             responses = []
             for seq in sample_response.sequences:
-                # Decode only the generated tokens (exclude prompt).
-                # SampledSequence exposes .tokens in tinker >=0.16.
-                generated_ids = seq.tokens[len(token_ids):]
-                text = self._tokenizer.decode(generated_ids, skip_special_tokens=True)
+                # SampledSequence.tokens in tinker >=0.16 holds ONLY the newly
+                # generated tokens (prompt is not prepended), so decode as-is.
+                text = self._tokenizer.decode(seq.tokens, skip_special_tokens=True)
                 responses.append(text.strip())
             results.append(responses)
 

@@ -84,9 +84,19 @@ class MBPPGenerationDataset(BaseDataset):
         
         return samples
     
-    def process_sample(self, sample: Sample, context: str) -> ProcessedSample:
+    def process_sample(
+        self,
+        sample: Sample,
+        context: str,
+        enable_thinking: bool = True,
+    ) -> ProcessedSample:
         """Process a raw sample for a specific context, forwarding base_suffix if set."""
-        return self.context_handler_class.apply_context(context, sample, base_suffix=self.base_suffix)
+        return self.context_handler_class.apply_context(
+            context,
+            sample,
+            enable_thinking=enable_thinking,
+            base_suffix=self.base_suffix,
+        )
 
     def get_dataset_info(self) -> Dict[str, Any]:
         """Get information about the dataset"""

@@ -30,7 +30,12 @@ class ContestErrorInjectionContextHandler(BaseContextHandler):
     ]
 
     @classmethod
-    def apply_context(cls, context: str, sample: Sample) -> ProcessedSample:
+    def apply_context(
+        cls,
+        context: str,
+        sample: Sample,
+        enable_thinking: bool = True,
+    ) -> ProcessedSample:
         """
         Apply a context to sample to generate a processed sample.
         Pure function - no side effects.

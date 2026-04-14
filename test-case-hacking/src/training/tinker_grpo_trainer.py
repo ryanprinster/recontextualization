@@ -129,6 +129,7 @@ class TinkerGRPOTrainer(Trainer):
             batch_size=self.config.prompt_batch_size,
             group_size=self.config.group_size,
             generation_context=self.config.generation_context,
+            enable_thinking=getattr(self.model, "enable_thinking", False),
             seed=self.config.seed or self.config.training_seed or 0,
             format_coef=self.config.format_coef,
             reward_timeout=self.config.reward_timeout,
