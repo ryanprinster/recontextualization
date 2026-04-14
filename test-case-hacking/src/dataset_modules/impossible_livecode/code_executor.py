@@ -198,6 +198,7 @@ else:
 
         # Execute against test cases
         execution_result = cls.execute_function_with_check(code, test_code, entry_point)
+        execution_result["executed_code"] = code
         result["execution_result"] = execution_result
 
         return result

@@ -235,6 +235,7 @@ run_assert_tests(code, assert_statements)
         
         # Execute against assert statements
         execution_result = cls.execute_code_against_asserts(code, assert_statements)
+        execution_result["executed_code"] = code
         result["execution_result"] = execution_result
         
         return result

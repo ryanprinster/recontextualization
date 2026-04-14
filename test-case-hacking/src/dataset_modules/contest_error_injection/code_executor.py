@@ -269,6 +269,7 @@ else:
         
         # Execute against test cases
         execution_result = cls.execute_code_against_tests(code, test_cases)
+        execution_result["executed_code"] = code
         result["execution_result"] = execution_result
         
         return result

@@ -178,6 +178,7 @@ except Exception as e:
 
         # Execute against ground truth tests
         execution_result = cls.execute_code_with_tests(code, setup, test_function)
+        execution_result["executed_code"] = code
         result["execution_result"] = execution_result
 
         return result
