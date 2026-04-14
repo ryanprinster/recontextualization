@@ -20,7 +20,12 @@ from tqdm import tqdm
 from ..configs.generation import GenerationConfig
 from ..dataset_modules.base import BaseDataset, Rollout, Sample
 from ..models.base import BaseModel
-from ..storage import RolloutStorage, is_cache_enabled, load_cached_rollouts
+from ..storage import (
+    RolloutCheckpoint,
+    RolloutStorage,
+    is_cache_enabled,
+    load_cached_rollouts,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +60,7 @@ class RolloutGenerator:
         context: str,
         generation_config: Optional[GenerationConfig] = None,
         evaluate: bool = True,
+        checkpoint: Optional[RolloutCheckpoint] = None,
         **kwargs,
     ) -> List[List[Rollout]]:
         """
@@ -81,12 +87,40 @@ class RolloutGenerator:
         if generation_config is None:
             generation_config = GenerationConfig()
 
-        # Check cache first if enabled
+        # Resume from checkpoint: drop any samples whose rollouts were already
+        # persisted in a prior run, and stash their rehydrated groups so we can
+        # weave them back into the final output in original sample order.
+        cached_groups_by_id: Dict[str, List[Rollout]] = {}
+        if checkpoint is not None:
+            completed_ids = checkpoint.completed_sample_ids()
+            if completed_ids:
+                for group in checkpoint.load_completed_rollouts():
+                    if group:
+                        cached_groups_by_id[group[0].sample.sample.id] = group
+                remaining_samples = [s for s in samples if s.id not in completed_ids]
+                skipped = len(samples) - len(remaining_samples)
+                if skipped:
+                    self.logger.info(
+                        "Resuming from checkpoint: skipping %d/%d samples already completed for context '%s'",
+                        skipped,
+                        len(samples),
+                        context,
+                    )
+                if not remaining_samples:
+                    return [cached_groups_by_id[s.id] for s in samples if s.id in cached_groups_by_id]
+                samples_to_run = remaining_samples
+            else:
+                samples_to_run = samples
+        else:
+            samples_to_run = samples
+
+        # Check cache first if enabled. When resuming from a checkpoint we
+        # only query the cache for the still-to-run samples.
         if is_cache_enabled():
-            sample_ids = [sample.id for sample in samples]
+            sample_ids = [sample.id for sample in samples_to_run]
             model_name = getattr(self.model, 'name', str(type(self.model).__name__))
             dataset_name = getattr(self.dataset, 'name', str(type(self.dataset).__name__))
-            
+
             try:
                 cached_rollouts = load_cached_rollouts(
                     model_name=model_name,
@@ -96,17 +130,22 @@ class RolloutGenerator:
                     sample_ids=sample_ids,
                     requested_n_rollouts=generation_config.n_rollouts
                 )
-                
+
                 if cached_rollouts is not None:
-                    self.logger.info(f"Using cached rollouts for {len(samples)} samples ({generation_config.n_rollouts} rollouts each)")
-                    return cached_rollouts
+                    self.logger.info(f"Using cached rollouts for {len(samples_to_run)} samples ({generation_config.n_rollouts} rollouts each)")
+                    run_groups_by_id = {
+                        group[0].sample.sample.id: group
+                        for group in cached_rollouts
+                        if group
+                    }
+                    return self._merge_in_sample_order(samples, cached_groups_by_id, run_groups_by_id)
             except Exception as e:
                 # Cache loading failed - fall back to generation
                 self.logger.warning(f"Cache loading failed, falling back to generation: {e}")
 
         # Step 1: Process samples with context (on-demand, no caching)
         processed_samples = []
-        for sample in samples:
+        for sample in samples_to_run:
             processed_sample = self.dataset.process_sample(sample, context)
             processed_samples.append(processed_sample)
 
@@ -161,16 +200,44 @@ class RolloutGenerator:
 
                 all_rollouts.extend(batch_grouped_rollouts)
 
+                # Persist the completed batch to the streaming checkpoint (if
+                # any) so trajectories survive crashes and are tailable live.
+                if checkpoint is not None:
+                    checkpoint.append_batch(batch_grouped_rollouts)
+
                 # Update progress bar
                 pbar.update(len(batch_samples))
 
         self.logger.debug(
             f"Generated {sum(len(group) for group in all_rollouts)} total rollouts "
-            f"for {len(samples)} samples with context '{context}'"
+            f"for {len(samples_to_run)} samples with context '{context}'"
             f"{' (evaluated)' if evaluate else ' (unevaluated)'}"
         )
 
+        if cached_groups_by_id:
+            run_groups_by_id = {
+                group[0].sample.sample.id: group
+                for group in all_rollouts
+                if group
+            }
+            return self._merge_in_sample_order(samples, cached_groups_by_id, run_groups_by_id)
+
         return all_rollouts
+
+    @staticmethod
+    def _merge_in_sample_order(
+        samples: List[Sample],
+        cached_by_id: Dict[str, List[Rollout]],
+        run_by_id: Dict[str, List[Rollout]],
+    ) -> List[List[Rollout]]:
+        """Return sample-groups in the order of the caller's input samples."""
+        merged: List[List[Rollout]] = []
+        for sample in samples:
+            if sample.id in run_by_id:
+                merged.append(run_by_id[sample.id])
+            elif sample.id in cached_by_id:
+                merged.append(cached_by_id[sample.id])
+        return merged
 
     def _create_generation_function(
         self, generation_config: GenerationConfig, **kwargs

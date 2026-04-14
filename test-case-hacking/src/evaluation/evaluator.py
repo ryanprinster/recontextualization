@@ -16,7 +16,7 @@ from ..configs.evaluation import EvaluationConfig
 from ..dataset_modules.base import BaseDataset, Rollout, Sample
 from ..generation import RolloutGenerator
 from ..models.base import BaseModel
-from ..storage import RolloutStorage
+from ..storage import RolloutCheckpoint, RolloutStorage
 from .metrics import EvaluationMetrics, EvaluationReport
 
 logger = logging.getLogger(__name__)
@@ -98,36 +98,58 @@ class Evaluator:
             self.logger.info(
                 f"Evaluating context '{context}' ({context_idx + 1}/{len(contexts)})"
             )
-            
+
+            # Compose save path: save_subdir + context
+            path = f"{save_subdir}/{context}" if save_subdir else context
+
+            # Set up incremental checkpoint for this context (streaming JSONL
+            # + auto-resume). Only active when save_results is on, since the
+            # checkpoint lives under the evaluator's output_dir.
+            checkpoint: Optional[RolloutCheckpoint] = None
+            if save_results and self.config.checkpoint_enabled:
+                checkpoint_path = Path(self.output_dir) / path / "rollouts.jsonl"
+                checkpoint = RolloutCheckpoint(
+                    path=checkpoint_path,
+                    signature=self._checkpoint_signature(model, context),
+                    include_messages=save_rollout_messages,
+                )
+
             # Generate rollouts for this context
             grouped_rollouts = rollout_generator.generate_rollouts(
                 samples=samples,
                 context=context,
                 generation_config=self.config.generation,
                 evaluate=True,  # Get evaluated rollouts
+                checkpoint=checkpoint,
             )
-            
+
             # Keep rollouts grouped for consistency
             context_rollouts = [rollout for group in grouped_rollouts for rollout in group]
-            
+
             self.logger.info(f"Generated {len(context_rollouts)} rollouts for '{context}'")
-            
+
             # Calculate metrics for this context (metrics calculator only handles pure metrics)
             context_report = self.metrics_calculator.calculate_metrics(
                 rollouts=context_rollouts,
                 contexts=[context],  # Single context
             )
-            
+
             # Add metadata for model evaluation (evaluator's responsibility)
             context_report.config_info = self._get_config_info()
             context_report.model_info = self._get_model_info(model)
-            
+
             # Save results for this context immediately
             if save_results:
-                # Compose path: save_subdir + context
-                path = f"{save_subdir}/{context}" if save_subdir else context
-                self._save_results(context_report, grouped_rollouts, path, save_rollout_messages)
-            
+                self._save_results(
+                    context_report,
+                    grouped_rollouts,
+                    path,
+                    save_rollout_messages,
+                    # When streaming to a checkpoint, the checkpoint IS the
+                    # rollouts artifact — skip the redundant timestamped file.
+                    write_rollouts_file=checkpoint is None,
+                )
+
             context_reports[context] = context_report
             self.logger.info(f"Completed evaluation for context '{context}'")
 
@@ -185,13 +207,19 @@ class Evaluator:
         return report
 
     def _save_results(
-        self, 
-        report: EvaluationReport, 
-        grouped_rollouts: List[List[Rollout]], 
+        self,
+        report: EvaluationReport,
+        grouped_rollouts: List[List[Rollout]],
         save_path: str,
-        save_rollout_messages: bool
+        save_rollout_messages: bool,
+        write_rollouts_file: bool = True,
     ) -> None:
-        """Save evaluation results to the specified path within the evaluation directory."""
+        """Save evaluation results to the specified path within the evaluation directory.
+
+        ``write_rollouts_file=False`` skips the timestamped rollouts JSONL — used
+        when an incremental checkpoint has already persisted rollouts to
+        ``rollouts.jsonl`` in the same directory.
+        """
         try:
             # Create directory structure based on output_dir and save_path
             if save_path:
@@ -200,9 +228,9 @@ class Evaluator:
             else:
                 # For training/other uses: output_dir/ (direct in output directory)
                 output_dir = Path(self.output_dir)
-                
+
             output_dir.mkdir(parents=True, exist_ok=True)
-            
+
             # Generate timestamp for filenames
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -211,26 +239,38 @@ class Evaluator:
             report.save(report_path)
             self.logger.info(f"Saved evaluation report to {report_path}")
 
-            # Always save rollouts (grouped by sample) with timestamped filename
-            rollouts_path = output_dir / f"evaluated_rollouts_{timestamp}.jsonl"
-            total_rollouts = sum(len(group) for group in grouped_rollouts)
-            metadata = {
-                "save_path": save_path,
-                "evaluation_timestamp": report.timestamp,
-                "total_rollouts": total_rollouts,
-                "include_messages": save_rollout_messages,
-            }
-            
-            self.storage.save_rollouts(
-                grouped_rollouts, 
-                rollouts_path, 
-                metadata, 
-                include_messages=save_rollout_messages
-            )
-            self.logger.info(f"Saved rollouts to {rollouts_path}")
-            
+            if write_rollouts_file:
+                # Save rollouts (grouped by sample) with timestamped filename
+                rollouts_path = output_dir / f"evaluated_rollouts_{timestamp}.jsonl"
+                total_rollouts = sum(len(group) for group in grouped_rollouts)
+                metadata = {
+                    "save_path": save_path,
+                    "evaluation_timestamp": report.timestamp,
+                    "total_rollouts": total_rollouts,
+                    "include_messages": save_rollout_messages,
+                }
+
+                self.storage.save_rollouts(
+                    grouped_rollouts,
+                    rollouts_path,
+                    metadata,
+                    include_messages=save_rollout_messages
+                )
+                self.logger.info(f"Saved rollouts to {rollouts_path}")
+
         except Exception as e:
             self.logger.warning(f"Failed to save evaluation results: {e}")
+
+    def _checkpoint_signature(self, model: BaseModel, context: str) -> Dict[str, Any]:
+        """Build the signature recorded in a checkpoint's header for resume validation."""
+        return {
+            "model_name": getattr(model, "name", model.__class__.__name__),
+            "dataset": self.dataset.__class__.__name__,
+            "context": context,
+            "generation": self.config.generation.to_dict(),
+            "enable_thinking": getattr(model, "enable_thinking", False),
+            "n_samples": self.config.n_samples,
+        }
 
 
     def _get_config_info(self) -> Dict[str, Any]:

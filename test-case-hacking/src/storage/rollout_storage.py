@@ -15,6 +15,32 @@ from typing import Any, Dict, List, Optional, Union
 logger = logging.getLogger(__name__)
 
 
+def serialize_sample_group(
+    sample_rollouts: List[Any],
+    include_messages: bool = False,
+) -> Dict[str, Any]:
+    """Serialize one sample's rollouts into the canonical JSONL record shape.
+
+    Shared between batch-final saves and incremental checkpoint appends so both
+    paths emit the exact same schema.
+    """
+    return {
+        "sample": sample_rollouts[0].sample.sample.to_summary(),
+        "rollouts": [
+            {
+                "rollout": {
+                    "context": rollout.sample.context,
+                    "model_response": rollout.final_response,
+                    **({"messages": rollout.messages} if include_messages else {})
+                },
+                "evaluation": rollout.evaluation_result.to_summary() if rollout.evaluation_result else None,
+                **({"metadata": rollout.metadata} if rollout.metadata else {})
+            }
+            for rollout in sample_rollouts
+        ]
+    }
+
+
 class RolloutStorage:
     """Simple rollout storage - always expects grouped rollouts"""
 
@@ -62,22 +88,7 @@ class RolloutStorage:
             for sample_rollouts in grouped_rollouts:
                 if not sample_rollouts:  # Skip empty groups
                     continue
-                    
-                sample_data = {
-                    "sample": sample_rollouts[0].sample.sample.to_summary(),
-                    "rollouts": [
-                        {
-                            "rollout": {
-                                "context": rollout.sample.context,
-                                "model_response": rollout.final_response,
-                                **({"messages": rollout.messages} if include_messages else {})
-                            },
-                            "evaluation": rollout.evaluation_result.to_summary() if rollout.evaluation_result else None,
-                            **({"metadata": rollout.metadata} if rollout.metadata else {})
-                        }
-                        for rollout in sample_rollouts
-                    ]
-                }
+                sample_data = serialize_sample_group(sample_rollouts, include_messages)
                 f.write(json.dumps(sample_data) + "\n")
         
         self.logger.info(f"Saved {len(grouped_rollouts)} samples with {total_rollouts} rollouts to {output_path}")

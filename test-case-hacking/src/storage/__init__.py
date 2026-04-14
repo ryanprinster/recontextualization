@@ -11,13 +11,17 @@ This module provides:
 - Consistent format across all components
 """
 
-from .rollout_storage import RolloutStorage
+from .rollout_storage import RolloutStorage, serialize_sample_group
+from .rollout_checkpoint import RolloutCheckpoint, CheckpointSignatureMismatch
 from .cache import use_cache, is_cache_enabled, load_cached_rollouts, save_rollouts_to_cache
 
 __all__ = [
     "RolloutStorage",
-    "use_cache", 
+    "serialize_sample_group",
+    "RolloutCheckpoint",
+    "CheckpointSignatureMismatch",
+    "use_cache",
     "is_cache_enabled",
     "load_cached_rollouts",
-    "save_rollouts_to_cache"
+    "save_rollouts_to_cache",
 ]
