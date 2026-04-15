@@ -189,6 +189,21 @@ def render_rollout(
         json_block(eval_summary),
     ]
 
+    executed_code_sections = []
+    if isinstance(eval_metadata, dict):
+        for key in ("public_execution", "correct_execution", "private_execution"):
+            block = eval_metadata.get(key)
+            if isinstance(block, dict) and block.get("executed_code"):
+                executed_code_sections.append((key, block["executed_code"]))
+    for key, code in executed_code_sections:
+        parts += [
+            "",
+            f"### Executed code ({key})",
+            "```python",
+            code,
+            "```",
+        ]
+
     if args.include_exec_details and eval_metadata:
         parts += [
             "",

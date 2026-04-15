@@ -10,7 +10,10 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.pardir))
 
-from src.dataset_modules.code_extraction import extract_code, strip_top_level_asserts  # noqa: E402
+from src.dataset_modules.code_extraction import (  # noqa: E402
+    extract_code,
+    strip_top_level_asserts_and_prints,
+)
 
 
 def _structurally_equal(a: str, b: str) -> bool:
@@ -74,8 +77,7 @@ def test_two_fences_last_is_asserts_only_falls_back():
     assert _structurally_equal(extract_code(completion), expected)
 
 
-def test_two_fences_last_is_print_demo_NOT_fixed():
-    # Documents that non-assert trailing demos are out of scope for this fix.
+def test_two_fences_last_is_print_demo_falls_back():
     completion = (
         "```python\n"
         "def f(x):\n    return x\n"
@@ -85,7 +87,15 @@ def test_two_fences_last_is_print_demo_NOT_fixed():
         "```"
     )
     got = extract_code(completion)
-    assert _structurally_equal(got, "print(f(5))")
+    assert _structurally_equal(got, "def f(x):\n    return x")
+
+
+def test_print_inside_function_body_preserved():
+    code = "def f(x):\n    print(x)\n    return x"
+    completion = f"```python\n{code}\n```"
+    got = extract_code(completion)
+    assert _structurally_equal(got, code)
+    assert "print(x)" in got
 
 
 def test_no_fences_returns_empty():
@@ -143,11 +153,16 @@ def test_py_tag_not_recognised_by_current_extractor():
 def test_strip_helper_no_asserts_returns_input_verbatim():
     code = "def f():\n    return 1"
     # Exact-string: when nothing is stripped, we skip the unparse round-trip.
-    assert strip_top_level_asserts(code) == code
+    assert strip_top_level_asserts_and_prints(code) == code
 
 
 def test_strip_helper_only_asserts_becomes_empty():
-    out = strip_top_level_asserts("assert 1 == 1\nassert 2 == 2").strip()
+    out = strip_top_level_asserts_and_prints("assert 1 == 1\nassert 2 == 2").strip()
+    assert out == ""
+
+
+def test_strip_helper_only_prints_becomes_empty():
+    out = strip_top_level_asserts_and_prints("print(1)\nprint('hi')").strip()
     assert out == ""
 
 
