@@ -39,16 +39,21 @@ class MBPPGenerationDataset(BaseDataset):
         use_incorrect_tests: bool = False,
         base_suffix: str = None,
         train_ratio: float = 0.8,
-        random_seed: int = 42
+        random_seed: int = 42,
+        max_prompt_tokens: Optional[int] = 10000,
+        tokenizer_model: Optional[str] = "Qwen/Qwen3-8B",
     ):
         # Initialize dataset-specific attributes
         self.data_path = data_path
         self.use_incorrect_tests = use_incorrect_tests
         self.base_suffix = base_suffix
         self.train_ratio = train_ratio
-        
+
         # Load and split data
         self.samples = self.load_samples()
+        self.samples = self.filter_by_prompt_length(
+            self.samples, max_prompt_tokens, tokenizer_model
+        )
         self.train_samples, self.val_samples = self.split_data(self.samples, train_ratio, random_seed)
     
     def load_samples(self) -> List[MBPPGenerationSample]:

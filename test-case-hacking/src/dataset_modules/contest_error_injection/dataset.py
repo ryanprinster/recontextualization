@@ -47,6 +47,8 @@ class ContestErrorInjectionDataset(BaseDataset):
         max_private_test_cases: int = 5,
         train_ratio: float = 0.8,
         random_seed: int = 42,
+        max_prompt_tokens: Optional[int] = 10000,
+        tokenizer_model: Optional[str] = "Qwen/Qwen3-8B",
     ):
         """
         Initialize Contest Error Injection dataset.
@@ -69,6 +71,9 @@ class ContestErrorInjectionDataset(BaseDataset):
 
         # Load and split data
         self.samples = self.load_samples()
+        self.samples = self.filter_by_prompt_length(
+            self.samples, max_prompt_tokens, tokenizer_model
+        )
         self.train_samples, self.val_samples = self.split_data(
             self.samples, train_ratio, random_seed
         )

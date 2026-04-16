@@ -48,6 +48,8 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             use_incorrect_tests=config.use_incorrect_tests,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
+            max_prompt_tokens=config.max_prompt_tokens,
+            tokenizer_model=config.tokenizer_model,
         )
     elif isinstance(config, ContestErrorInjectionConfig):
         return ContestErrorInjectionDataset(
@@ -57,6 +59,8 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             max_private_test_cases=config.max_private_test_cases,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
+            max_prompt_tokens=config.max_prompt_tokens,
+            tokenizer_model=config.tokenizer_model,
         )
     elif isinstance(config, RLRewardHackingConfig):
         return RLRewardHackingDataset(
@@ -65,6 +69,8 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             difficulties=config.difficulties,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
+            max_prompt_tokens=config.max_prompt_tokens,
+            tokenizer_model=config.tokenizer_model,
         )
     elif isinstance(config, ImpossibleLiveCodeConfig):
         return ImpossibleLiveCodeDataset(
@@ -72,6 +78,8 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
             context_suffix_override=config.context_suffix_override,
+            max_prompt_tokens=config.max_prompt_tokens,
+            tokenizer_model=config.tokenizer_model,
         )
     elif isinstance(config, MBPPGenerationConfig):
         return MBPPGenerationDataset(
@@ -79,6 +87,8 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             base_suffix=config.base_suffix,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
+            max_prompt_tokens=config.max_prompt_tokens,
+            tokenizer_model=config.tokenizer_model,
         )
     else:
         raise ValueError(f"Unsupported dataset config type: {type(config)}")

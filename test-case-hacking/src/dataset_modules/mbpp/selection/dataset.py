@@ -7,7 +7,7 @@ following the clean architecture with no circular dependencies.
 
 import json
 import hashlib
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from ...base import BaseDataset
 from .evaluation import MBPPSelectionEvaluator
@@ -37,15 +37,20 @@ class MBPPSelectionDataset(BaseDataset):
         include_test_cases: bool = True,
         use_incorrect_tests: bool = True,
         train_ratio: float = 0.8,
-        random_seed: int = 42
+        random_seed: int = 42,
+        max_prompt_tokens: Optional[int] = 10000,
+        tokenizer_model: Optional[str] = "Qwen/Qwen3-8B",
     ):
-        # Initialize dataset-specific attributes  
+        # Initialize dataset-specific attributes
         self.data_path = data_path
         self.include_test_cases = include_test_cases
         self.use_incorrect_tests = use_incorrect_tests
-        
+
         # Load and split data
         self.samples = self.load_samples()
+        self.samples = self.filter_by_prompt_length(
+            self.samples, max_prompt_tokens, tokenizer_model
+        )
         self.train_samples, self.val_samples = self.split_data(self.samples, train_ratio, random_seed)
     
     def load_samples(self) -> List[MBPPSelectionSample]:

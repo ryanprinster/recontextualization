@@ -13,6 +13,8 @@ class BaseDatasetConfig:
 
     train_ratio: float = 0.8
     random_seed: int = 42
+    max_prompt_tokens: Optional[int] = 10000
+    tokenizer_model: Optional[str] = "Qwen/Qwen3-8B"
 
 
 @dataclass

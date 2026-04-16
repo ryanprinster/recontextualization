@@ -10,10 +10,13 @@ Architecture: Clean dependency layers with no circular references.
 """
 
 import json
+import logging
 import random
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 # ================================
 # LAYER 1: PURE DATA STRUCTURES (No dependencies)
@@ -421,6 +424,44 @@ class BaseDataset(ABC):
     
     # ---- Data Management Utility Methods ----
     
+    def filter_by_prompt_length(
+        self,
+        samples: List[Sample],
+        max_tokens: Optional[int],
+        tokenizer_model: Optional[str],
+        context: str = "standard",
+    ) -> List[Sample]:
+        """Drop samples whose tokenized prompt exceeds max_tokens under the given context."""
+        if max_tokens is None or tokenizer_model is None:
+            return samples
+
+        from transformers import AutoTokenizer
+
+        tok = AutoTokenizer.from_pretrained(tokenizer_model)
+        kept: List[Sample] = []
+        dropped = 0
+        for s in samples:
+            processed = self.process_sample(s, context, enable_thinking=True)
+            text = tok.apply_chat_template(
+                processed.messages, tokenize=False, add_generation_prompt=True
+            )
+            n_tokens = len(tok.encode(text))
+            if n_tokens > max_tokens:
+                dropped += 1
+                logger.debug(
+                    "filter_by_prompt_length: dropping %s (%d > %d tokens)",
+                    getattr(s, "id", "?"), n_tokens, max_tokens,
+                )
+            else:
+                kept.append(s)
+        if dropped:
+            logger.info(
+                "filter_by_prompt_length: dropped %d / %d samples exceeding %d tokens "
+                "(context=%s, tokenizer=%s)",
+                dropped, len(samples), max_tokens, context, tokenizer_model,
+            )
+        return kept
+
     def split_data(self, samples: List[Sample], train_ratio: float = 0.8, random_seed: int = 42) -> tuple[List[Sample], List[Sample]]:
         """Split samples into train/validation sets - returns (train_samples, val_samples)"""
         random.seed(random_seed)
