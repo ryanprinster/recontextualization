@@ -15,6 +15,7 @@ Example:
 import argparse
 import json
 import os
+import difflib
 import random
 import re
 import sys
@@ -130,6 +131,58 @@ def json_block(obj: Any) -> str:
     return "```json\n" + json.dumps(obj, indent=2, sort_keys=True, default=str) + "\n```"
 
 
+TEST_FIELD_KEYS = ("public_test", "correct_test", "public_test_cases", "correct_test_cases")
+
+
+def render_tests_block(sample: dict) -> List[str]:
+    """Render a 'Tests' section showing public (possibly mutated) and correct tests.
+
+    Returns empty list if the sample doesn't carry test fields (old rollouts).
+    """
+    pub_list = sample.get("public_test_cases")
+    cor_list = sample.get("correct_test_cases")
+    pub_str = sample.get("public_test")
+    cor_str = sample.get("correct_test")
+
+    if isinstance(pub_list, list) and isinstance(cor_list, list):
+        lines = ["", "### Tests"]
+        n = max(len(pub_list), len(cor_list))
+        for i in range(n):
+            p = pub_list[i] if i < len(pub_list) else None
+            c = cor_list[i] if i < len(cor_list) else None
+            differs = p != c
+            tag = "  **(differs)**" if differs else ""
+            lines += [f"#### Test {i}{tag}"]
+            lines += ["_public (shown to model):_", "```python", str(p), "```"]
+            if differs:
+                lines += ["_correct (ground truth):_", "```python", str(c), "```"]
+        return lines
+
+    if isinstance(pub_str, str) and isinstance(cor_str, str):
+        lines = ["", "### Tests", "_public (shown to model):_", "```python", pub_str, "```"]
+        if sample.get("impossible_type") != "original" and pub_str != cor_str:
+            diff = "".join(
+                difflib.unified_diff(
+                    cor_str.splitlines(keepends=True),
+                    pub_str.splitlines(keepends=True),
+                    fromfile="correct",
+                    tofile="public",
+                )
+            )
+            lines += [
+                "",
+                "<details><summary>Diff (correct → public)</summary>",
+                "",
+                "```diff",
+                diff.rstrip(),
+                "```",
+                "</details>",
+            ]
+        return lines
+
+    return []
+
+
 def render_rollout(
     index: int,
     source: Path,
@@ -151,7 +204,10 @@ def render_rollout(
     except ValueError:
         rel = source
 
-    header_fields = {k: v for k, v in sample.items() if k != "problem"}
+    header_fields = {
+        k: v for k, v in sample.items()
+        if k != "problem" and k not in TEST_FIELD_KEYS
+    }
     problem = sample.get("problem", "")
     prompt_text = maybe_truncate(get_prompt(rollout), args.truncate_prompt)
     response_text = maybe_truncate(rollout.get("model_response", ""), args.truncate_response)
@@ -188,6 +244,8 @@ def render_rollout(
         "### Evaluation",
         json_block(eval_summary),
     ]
+
+    parts += render_tests_block(sample)
 
     executed_code_sections = []
     if isinstance(eval_metadata, dict):

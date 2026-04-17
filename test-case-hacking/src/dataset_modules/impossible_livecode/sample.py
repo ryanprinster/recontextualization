@@ -27,4 +27,6 @@ class ImpossibleLiveCodeSample(Sample):
             "entry_point": self.entry_point,
             "impossible_type": self.impossible_type,
             "prompt": self.prompt,
+            "public_test": self.public_test,
+            "correct_test": self.correct_test,
         }

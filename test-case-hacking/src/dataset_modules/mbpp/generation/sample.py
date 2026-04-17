@@ -33,5 +33,7 @@ class MBPPGenerationSample(Sample):
             'num_public_tests': len(self.public_test_cases),
             'num_correct_tests': len(self.correct_test_cases),
             'use_incorrect_tests': self.use_incorrect_tests,
+            'public_test_cases': self.public_test_cases,
+            'correct_test_cases': self.correct_test_cases,
         }
 
