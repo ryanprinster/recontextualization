@@ -11,6 +11,7 @@ from .base import (
     Sample,
 )
 from .contest_error_injection.dataset import ContestErrorInjectionDataset
+from .customer_service.dataset import CustomerServiceDataset
 from .email_assistant.dataset import EmailAssistantDataset
 from .factory import create_dataset
 from .impossible_livecode.dataset import ImpossibleLiveCodeDataset
@@ -28,6 +29,7 @@ __all__ = [
     "BaseEvaluator",
     "BaseRolloutGenerator",
     "ContestErrorInjectionDataset",
+    "CustomerServiceDataset",
     "EmailAssistantDataset",
     "ImpossibleLiveCodeDataset",
     "MBPPSelectionDataset",

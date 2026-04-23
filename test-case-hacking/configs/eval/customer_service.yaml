@@ -1,0 +1,20 @@
+# @package _global_
+# Evaluation on Customer Service dataset
+defaults:
+  - /components/model: gpt4_1_mini
+  - /components/dataset: customer_service
+  - /components/evaluation: customer_service
+  - _self_
+
+# Global settings
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+# Evaluation settings
+sample_source: "all"
+
+# Hydra output directory
+hydra:
+  run:
+    dir: experiments/evaluation/customer_service/${now:%Y-%m-%d_%H-%M-%S}

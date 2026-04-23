@@ -1,0 +1,28 @@
+# @package dataset
+_target_: src.configs.dataset.CustomerServiceConfig
+
+# Path to one-problem-per-line .txt file (source: reward-hacking-evals).
+data_path: "data/customer_service/customer_service_problems.txt"
+
+# Customer personas to cycle through when generating samples. null = use all 6
+# (friendly, belligerent, distracted, neutral, confused, amateur).
+customer_types: null
+
+# Simulator model (separate OpenAI model used as the "customer").
+simulator_model_name: "gpt-4.1-mini"
+
+# Max bot turns before the conversation is force-ended.
+max_turns: 10
+
+# Number of (problem, customer_type) samples to generate per run.
+num_samples: 30
+
+# Train/validation split
+train_ratio: 0.8
+random_seed: ${dataset_seed}
+
+# Prompt-length filtering disabled: the initial ProcessedSample only has the
+# bot's system prompt (no user turn yet), which would underestimate the full
+# multi-turn prompt size.
+max_prompt_tokens: null
+tokenizer_model: null

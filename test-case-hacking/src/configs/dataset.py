@@ -74,3 +74,17 @@ class EmailAssistantConfig(BaseDatasetConfig):
     # the system + first email, which would underestimate the multi-turn prompt.
     max_prompt_tokens: Optional[int] = None
     tokenizer_model: Optional[str] = None
+
+
+@dataclass
+class CustomerServiceConfig(BaseDatasetConfig):
+    """Customer Service dataset configuration (ported from reward-hacking-evals)."""
+
+    data_path: str = "data/customer_service/customer_service_problems.txt"
+    customer_types: Optional[List[str]] = None  # None = all 6 personas
+    simulator_model_name: str = "gpt-4.1-mini"
+    max_turns: int = 10
+    num_samples: int = 30
+    # Initial ProcessedSample is just the bot's system prompt, so filter is off.
+    max_prompt_tokens: Optional[int] = None
+    tokenizer_model: Optional[str] = None
