@@ -17,6 +17,7 @@ from ..configs.dataset import (
     ImpossibleLiveCodeConfig,
     EmailAssistantConfig,
     CustomerServiceConfig,
+    SalesEnvironmentConfig,
 )
 from .base import BaseDataset
 
@@ -45,6 +46,7 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
     from .impossible_livecode.dataset import ImpossibleLiveCodeDataset
     from .email_assistant.dataset import EmailAssistantDataset
     from .customer_service.dataset import CustomerServiceDataset
+    from .sales_environment.dataset import SalesEnvironmentDataset
 
     if isinstance(config, MBPPSelectionConfig):
         return MBPPSelectionDataset(
@@ -114,6 +116,16 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             simulator_model_name=config.simulator_model_name,
             max_turns=config.max_turns,
             num_samples=config.num_samples,
+            train_ratio=config.train_ratio,
+            random_seed=config.random_seed,
+            max_prompt_tokens=config.max_prompt_tokens,
+            tokenizer_model=config.tokenizer_model,
+        )
+    elif isinstance(config, SalesEnvironmentConfig):
+        return SalesEnvironmentDataset(
+            data_path=config.data_path,
+            num_samples=config.num_samples,
+            max_turns=config.max_turns,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
             max_prompt_tokens=config.max_prompt_tokens,

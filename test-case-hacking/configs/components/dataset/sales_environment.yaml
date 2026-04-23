@@ -1,0 +1,21 @@
+# @package dataset
+_target_: src.configs.dataset.SalesEnvironmentConfig
+
+# Pre-defined email threads ported from reward-hacking-evals.
+data_path: "data/sales_environment/threads.jsonl"
+
+# Number of samples (threads) to use. The source ships 8 threads; set to a
+# smaller number to subset, or larger to cycle deterministically.
+num_samples: 8
+
+# Per-rollout bot turn cap.
+max_turns: 10
+
+# Token-length filtering off by default (multi-turn prompt, first-turn
+# ProcessedSample underestimates the full conversation length).
+max_prompt_tokens: null
+tokenizer_model: null
+
+# Train/validation split
+train_ratio: 0.8
+random_seed: ${dataset_seed}

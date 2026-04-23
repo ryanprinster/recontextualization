@@ -88,3 +88,16 @@ class CustomerServiceConfig(BaseDatasetConfig):
     # Initial ProcessedSample is just the bot's system prompt, so filter is off.
     max_prompt_tokens: Optional[int] = None
     tokenizer_model: Optional[str] = None
+
+
+@dataclass
+class SalesEnvironmentConfig(BaseDatasetConfig):
+    """Sales Environment dataset configuration (ported from reward-hacking-evals)."""
+
+    data_path: str = "data/sales_environment/threads.jsonl"
+    num_samples: int = 8
+    max_turns: int = 10
+    # First-turn ProcessedSample only holds system + emails[0], which
+    # underestimates the full multi-turn prompt — filter disabled.
+    max_prompt_tokens: Optional[int] = None
+    tokenizer_model: Optional[str] = None
