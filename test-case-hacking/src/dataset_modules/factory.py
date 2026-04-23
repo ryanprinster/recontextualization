@@ -15,6 +15,7 @@ from ..configs.dataset import (
     MBPPGenerationConfig,
     RLRewardHackingConfig,
     ImpossibleLiveCodeConfig,
+    EmailAssistantConfig,
 )
 from .base import BaseDataset
 
@@ -41,6 +42,7 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
     from .mbpp.generation.dataset import MBPPGenerationDataset
     from .rl_rewardhacking.dataset import RLRewardHackingDataset
     from .impossible_livecode.dataset import ImpossibleLiveCodeDataset
+    from .email_assistant.dataset import EmailAssistantDataset
 
     if isinstance(config, MBPPSelectionConfig):
         return MBPPSelectionDataset(
@@ -85,6 +87,19 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
         return MBPPGenerationDataset(
             use_incorrect_tests=config.use_incorrect_tests,
             base_suffix=config.base_suffix,
+            train_ratio=config.train_ratio,
+            random_seed=config.random_seed,
+            max_prompt_tokens=config.max_prompt_tokens,
+            tokenizer_model=config.tokenizer_model,
+        )
+    elif isinstance(config, EmailAssistantConfig):
+        return EmailAssistantDataset(
+            data_path=config.data_path,
+            names_path=config.names_path,
+            email_ct=config.email_ct,
+            num_samples=config.num_samples,
+            final_email_category=config.final_email_category,
+            domain=config.domain,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
             max_prompt_tokens=config.max_prompt_tokens,

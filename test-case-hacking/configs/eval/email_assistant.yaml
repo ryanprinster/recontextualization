@@ -1,0 +1,17 @@
+# @package _global_
+# Evaluation on the Email Assistant dataset
+defaults:
+  - /components/model: gpt4_1_mini
+  - /components/dataset: email_assistant
+  - /components/evaluation: email_assistant
+  - _self_
+
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+sample_source: "all"
+
+hydra:
+  run:
+    dir: experiments/evaluation/email_assistant/${now:%Y-%m-%d_%H-%M-%S}

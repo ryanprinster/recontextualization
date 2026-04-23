@@ -11,6 +11,7 @@ from .base import (
     Sample,
 )
 from .contest_error_injection.dataset import ContestErrorInjectionDataset
+from .email_assistant.dataset import EmailAssistantDataset
 from .factory import create_dataset
 from .impossible_livecode.dataset import ImpossibleLiveCodeDataset
 from .mbpp.selection.dataset import MBPPSelectionDataset
@@ -27,6 +28,7 @@ __all__ = [
     "BaseEvaluator",
     "BaseRolloutGenerator",
     "ContestErrorInjectionDataset",
+    "EmailAssistantDataset",
     "ImpossibleLiveCodeDataset",
     "MBPPSelectionDataset",
     "MBPPGenerationDataset",

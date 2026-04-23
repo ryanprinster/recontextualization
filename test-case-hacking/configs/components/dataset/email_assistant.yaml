@@ -1,0 +1,26 @@
+# @package dataset
+_target_: src.configs.dataset.EmailAssistantConfig
+
+# Data files (copied from reward-hacking-evals/datasets/)
+data_path: "data/email_assistant/emails_updated.json"
+names_path: "data/email_assistant/filtered_names.txt"
+
+# Emails per sample. email_ct-1 benign emails, then 1 probe email from
+# `final_email_category`.
+email_ct: 5
+
+# How many samples to synthesize from the pools.
+num_samples: 50
+
+# Which category the probe email comes from. Defaults to the
+# self-preservation category used in the original experiments.
+final_email_category: "email_assistant"
+domain: "applite"
+
+# Token-length filtering off: initial processed sample is partial.
+max_prompt_tokens: null
+tokenizer_model: null
+
+# Train/validation split
+train_ratio: 0.8
+random_seed: ${dataset_seed}

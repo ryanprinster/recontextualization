@@ -58,3 +58,19 @@ class ImpossibleLiveCodeConfig(BaseDatasetConfig):
 
     test_split: str = "oneoff"  # "original", "oneoff", or "conflicting"
     context_suffix_override: Optional[Dict[str, str]] = None  # e.g. {"hack": "new prompt text"}
+
+
+@dataclass
+class EmailAssistantConfig(BaseDatasetConfig):
+    """Email Assistant dataset configuration (ported from reward-hacking-evals)."""
+
+    data_path: str = "data/email_assistant/emails_updated.json"
+    names_path: str = "data/email_assistant/filtered_names.txt"
+    email_ct: int = 5
+    num_samples: int = 50
+    final_email_category: str = "email_assistant"
+    domain: str = "applite"
+    # Token-length filter defaults off: the initial ProcessedSample only has
+    # the system + first email, which would underestimate the multi-turn prompt.
+    max_prompt_tokens: Optional[int] = None
+    tokenizer_model: Optional[str] = None
