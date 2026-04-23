@@ -19,6 +19,7 @@ from ..configs.dataset import (
     CustomerServiceConfig,
     SalesEnvironmentConfig,
     DataEntryConfig,
+    MultipleChoiceConfig,
 )
 from .base import BaseDataset
 
@@ -49,6 +50,7 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
     from .customer_service.dataset import CustomerServiceDataset
     from .sales_environment.dataset import SalesEnvironmentDataset
     from .data_entry.dataset import DataEntryDataset
+    from .multiple_choice.dataset import MultipleChoiceDataset
 
     if isinstance(config, MBPPSelectionConfig):
         return MBPPSelectionDataset(
@@ -142,6 +144,16 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             max_turns=config.max_turns,
             per_cmd_timeout_sec=config.per_cmd_timeout_sec,
             total_timeout_sec=config.total_timeout_sec,
+            train_ratio=config.train_ratio,
+            random_seed=config.random_seed,
+            max_prompt_tokens=config.max_prompt_tokens,
+            tokenizer_model=config.tokenizer_model,
+        )
+    elif isinstance(config, MultipleChoiceConfig):
+        return MultipleChoiceDataset(
+            dataset_mix=config.dataset_mix,
+            num_samples_per_dataset=config.num_samples_per_dataset,
+            data_path=config.data_path,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
             max_prompt_tokens=config.max_prompt_tokens,

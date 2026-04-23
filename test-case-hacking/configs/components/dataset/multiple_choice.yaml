@@ -1,0 +1,15 @@
+# @package dataset
+_target_: src.configs.dataset.MultipleChoiceConfig
+
+# Which underlying datasets to mix
+dataset_mix: ["revealing_score", "world_affecting_reward"]
+
+# How many samples per dataset (before train/val split)
+num_samples_per_dataset: 100
+
+# Directory containing the JSONL files
+data_path: "data/multiple_choice"
+
+# Train/validation split
+train_ratio: 0.8
+random_seed: ${dataset_seed}

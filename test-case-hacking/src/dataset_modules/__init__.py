@@ -18,6 +18,7 @@ from .factory import create_dataset
 from .impossible_livecode.dataset import ImpossibleLiveCodeDataset
 from .mbpp.selection.dataset import MBPPSelectionDataset
 from .mbpp.generation.dataset import MBPPGenerationDataset
+from .multiple_choice.dataset import MultipleChoiceDataset
 from .rl_rewardhacking.dataset import RLRewardHackingDataset
 from .sales_environment.dataset import SalesEnvironmentDataset
 
@@ -37,6 +38,7 @@ __all__ = [
     "ImpossibleLiveCodeDataset",
     "MBPPSelectionDataset",
     "MBPPGenerationDataset",
+    "MultipleChoiceDataset",
     "RLRewardHackingDataset",
     "SalesEnvironmentDataset",
     "create_dataset",

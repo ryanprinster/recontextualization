@@ -118,3 +118,14 @@ class DataEntryConfig(BaseDatasetConfig):
     # sample (only system + first user message), so filter is disabled.
     max_prompt_tokens: Optional[int] = None
     tokenizer_model: Optional[str] = None
+
+
+@dataclass
+class MultipleChoiceConfig(BaseDatasetConfig):
+    """Multiple choice dataset configuration"""
+
+    dataset_mix: List[str] = field(
+        default_factory=lambda: ["revealing_score", "world_affecting_reward"]
+    )
+    num_samples_per_dataset: int = 100
+    data_path: str = "data/multiple_choice"

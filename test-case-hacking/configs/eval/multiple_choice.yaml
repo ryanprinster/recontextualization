@@ -1,0 +1,20 @@
+# @package _global_
+# Evaluation on multiple choice dataset
+defaults:
+  - /components/model: gpt4_1_mini
+  - /components/dataset: multiple_choice
+  - /components/evaluation: multiple_choice
+  - _self_
+
+# Global settings
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+# Evaluation settings
+sample_source: "all"
+
+# Hydra output directory
+hydra:
+  run:
+    dir: experiments/evaluation/multiple_choice/${now:%Y-%m-%d_%H-%M-%S}
