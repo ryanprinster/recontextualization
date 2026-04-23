@@ -1,0 +1,15 @@
+# @package model
+# DeepSeek R1 (reasoning) via OpenRouter.
+# `include_reasoning: true` asks OR to return the chain-of-thought on
+# `choice.message.reasoning`; OpenAIModel wraps it in <think>...</think>.
+_target_: src.models.openai_model.OpenAIModel
+
+name: deepseek/deepseek-r1
+base_url: https://openrouter.ai/api/v1
+api_key: ${oc.env:OPENROUTER_API_KEY}
+use_async: true
+timeout: 300
+max_retries: 5
+rate_limit_delay: 2.0
+extra_body:
+  include_reasoning: true

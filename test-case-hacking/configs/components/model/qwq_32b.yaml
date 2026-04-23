@@ -1,0 +1,14 @@
+# @package model
+# QwQ 32B (reasoning Qwen) via OpenRouter.
+# QwQ emits <think>...</think> inside its .content directly (same convention
+# as local vLLM Qwen3), so `include_reasoning` is not needed — the <think>
+# block is already part of the response text.
+_target_: src.models.openai_model.OpenAIModel
+
+name: qwen/qwq-32b
+base_url: https://openrouter.ai/api/v1
+api_key: ${oc.env:OPENROUTER_API_KEY}
+use_async: true
+timeout: 300
+max_retries: 5
+rate_limit_delay: 2.0

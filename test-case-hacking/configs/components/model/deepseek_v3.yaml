@@ -1,0 +1,11 @@
+# @package model
+# DeepSeek V3 via OpenRouter (OpenAI-compatible).
+_target_: src.models.openai_model.OpenAIModel
+
+name: deepseek/deepseek-chat
+base_url: https://openrouter.ai/api/v1
+api_key: ${oc.env:OPENROUTER_API_KEY}
+use_async: true
+timeout: 120
+max_retries: 5
+rate_limit_delay: 2.0

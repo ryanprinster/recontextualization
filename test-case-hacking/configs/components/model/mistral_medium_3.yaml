@@ -1,0 +1,11 @@
+# @package model
+# Mistral Medium 3 via OpenRouter. Proprietary; only OR and Mistral API serve it.
+_target_: src.models.openai_model.OpenAIModel
+
+name: mistralai/mistral-medium-3
+base_url: https://openrouter.ai/api/v1
+api_key: ${oc.env:OPENROUTER_API_KEY}
+use_async: true
+timeout: 120
+max_retries: 5
+rate_limit_delay: 2.0

@@ -17,6 +17,23 @@ from .base import BaseModel
 logger = logging.getLogger(__name__)
 
 
+def _format_choice(choice) -> str:
+    """Render one OpenAI-API choice as a plain string.
+
+    Extracts the visible content and, if the provider also returned separate
+    reasoning tokens (e.g. OpenRouter's `reasoning` field for DeepSeek R1 /
+    Magistral when `include_reasoning=true`), prepends them as a `<think>`
+    block so downstream evaluators see the same shape VLLMModel emits.
+    """
+    content = (choice.message.content or "").strip()
+    reasoning = getattr(choice.message, "reasoning", None) or getattr(
+        choice.message, "reasoning_content", None
+    )
+    if reasoning:
+        return f"<think>{reasoning.strip()}</think>\n\n{content}"
+    return content
+
+
 class OpenAIModel(BaseModel):
     """OpenAI model with fine-tuning support"""
     
@@ -85,7 +102,7 @@ class OpenAIModel(BaseModel):
                             response = await self.client.chat.completions.create(messages=messages, extra_body=self.extra_body, **params)
                         else:
                             response = self.client.chat.completions.create(messages=messages, extra_body=self.extra_body, **params)
-                        return [(choice.message.content or "").strip() for choice in response.choices]
+                        return [_format_choice(choice) for choice in response.choices]
                     except Exception as e:
                         logger.warning(f"API call failed (attempt {attempt + 1}): {e}")
                         if attempt < self.max_retries - 1:

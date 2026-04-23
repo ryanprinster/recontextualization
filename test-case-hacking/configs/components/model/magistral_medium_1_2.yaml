@@ -1,0 +1,14 @@
+# @package model
+# Magistral Medium 1.2 (reasoning Mistral, 9/2025 release) via OpenRouter.
+# OR's slug for the 1.2 release is `magistral-medium-2509`.
+_target_: src.models.openai_model.OpenAIModel
+
+name: mistralai/magistral-medium-2509
+base_url: https://openrouter.ai/api/v1
+api_key: ${oc.env:OPENROUTER_API_KEY}
+use_async: true
+timeout: 300
+max_retries: 5
+rate_limit_delay: 2.0
+extra_body:
+  include_reasoning: true
