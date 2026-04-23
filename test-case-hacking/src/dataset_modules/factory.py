@@ -18,6 +18,7 @@ from ..configs.dataset import (
     EmailAssistantConfig,
     CustomerServiceConfig,
     SalesEnvironmentConfig,
+    DataEntryConfig,
 )
 from .base import BaseDataset
 
@@ -47,6 +48,7 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
     from .email_assistant.dataset import EmailAssistantDataset
     from .customer_service.dataset import CustomerServiceDataset
     from .sales_environment.dataset import SalesEnvironmentDataset
+    from .data_entry.dataset import DataEntryDataset
 
     if isinstance(config, MBPPSelectionConfig):
         return MBPPSelectionDataset(
@@ -126,6 +128,20 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             data_path=config.data_path,
             num_samples=config.num_samples,
             max_turns=config.max_turns,
+            train_ratio=config.train_ratio,
+            random_seed=config.random_seed,
+            max_prompt_tokens=config.max_prompt_tokens,
+            tokenizer_model=config.tokenizer_model,
+        )
+    elif isinstance(config, DataEntryConfig):
+        return DataEntryDataset(
+            problem_type=config.problem_type,
+            data_path=config.data_path,
+            tasks_per_sample=config.tasks_per_sample,
+            num_samples=config.num_samples,
+            max_turns=config.max_turns,
+            per_cmd_timeout_sec=config.per_cmd_timeout_sec,
+            total_timeout_sec=config.total_timeout_sec,
             train_ratio=config.train_ratio,
             random_seed=config.random_seed,
             max_prompt_tokens=config.max_prompt_tokens,

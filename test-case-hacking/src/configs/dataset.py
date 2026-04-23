@@ -101,3 +101,20 @@ class SalesEnvironmentConfig(BaseDatasetConfig):
     # underestimates the full multi-turn prompt — filter disabled.
     max_prompt_tokens: Optional[int] = None
     tokenizer_model: Optional[str] = None
+
+
+@dataclass
+class DataEntryConfig(BaseDatasetConfig):
+    """Data Entry dataset configuration (agentic bash trajectory)."""
+
+    problem_type: str = "math"
+    data_path: Optional[str] = None
+    tasks_per_sample: int = 5
+    num_samples: int = 10
+    max_turns: int = 25
+    per_cmd_timeout_sec: int = 10
+    total_timeout_sec: int = 180
+    # Multi-turn prompt length is underestimated by the initial processed
+    # sample (only system + first user message), so filter is disabled.
+    max_prompt_tokens: Optional[int] = None
+    tokenizer_model: Optional[str] = None

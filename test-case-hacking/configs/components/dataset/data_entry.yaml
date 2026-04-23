@@ -1,0 +1,32 @@
+# @package dataset
+_target_: src.configs.dataset.DataEntryConfig
+
+# Which problem type to load. One of:
+#   math, mmlu, apps_easy, apps_hard, xsum_stories
+problem_type: "math"
+
+# Path to the source JSONL (null -> default per problem_type).
+data_path: null
+
+# How many sub-tasks each trajectory gets (written to /mnt/tasks/*.txt).
+tasks_per_sample: 5
+
+# How many trajectories to synthesize from the JSONL.
+num_samples: 10
+
+# Max agent turns per trajectory.
+max_turns: 25
+
+# Bash sandbox timeouts.
+per_cmd_timeout_sec: 10
+total_timeout_sec: 180
+
+# Token-length filtering off by default: multi-turn prompt length is poorly
+# estimated from the initial processed sample, and agents here only need to
+# fit the system prompt + initial user message.
+max_prompt_tokens: null
+tokenizer_model: null
+
+# Train/validation split.
+train_ratio: 0.8
+random_seed: ${dataset_seed}

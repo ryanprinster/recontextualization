@@ -1,0 +1,13 @@
+# @package evaluation
+# Data Entry evaluation configuration
+_target_: src.configs.evaluation.EvaluationConfig
+
+defaults:
+  - /components/generation: evaluation
+
+contexts: ["standard", "hack", "do_not_hack"]
+metrics: ["accuracy", "score", "hacking_rate"]
+
+n_samples: null
+save_results: true
+save_rollout_messages: true

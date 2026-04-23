@@ -1,0 +1,17 @@
+# @package _global_
+# Evaluation on the Data Entry dataset
+defaults:
+  - /components/model: gpt4_1_mini
+  - /components/dataset: data_entry
+  - /components/evaluation: data_entry
+  - _self_
+
+seed: 42
+dataset_seed: ${seed}
+training_seed: ${seed}
+
+sample_source: "all"
+
+hydra:
+  run:
+    dir: experiments/evaluation/data_entry/${now:%Y-%m-%d_%H-%M-%S}
