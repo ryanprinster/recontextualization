@@ -1,8 +1,14 @@
 # @package model
-# Qwen 2.5 32B Instruct via OpenRouter.
+# Qwen 2.5 32B Instruct.
+# NOTE: OpenRouter does not currently host the 32B base instruct (only the
+# 7B/72B Instruct and Coder-32B variants). The reference reward-hacking-evals
+# code accessed Qwen 2.5 32B through a private Together deployment. For
+# OR-only access, this YAML falls back to the 72B Instruct variant — closest
+# general-purpose substitute. Override `name` if you have a Together / private
+# slug for the actual 32B.
 _target_: src.models.openai_model.OpenAIModel
 
-name: qwen/qwen-2.5-32b-instruct
+name: qwen/qwen-2.5-72b-instruct
 base_url: https://openrouter.ai/api/v1
 api_key: ${oc.env:OPENROUTER_API_KEY}
 use_async: true
