@@ -97,7 +97,11 @@ class BashSandbox:
         self._tasks_dir: Optional[Path] = None
         self._work_dir: Optional[Path] = None
         self._results_path: Optional[Path] = None
-        self._start_time: Optional[float] = None
+        # Total bash-command execution time accumulated so far (seconds).
+        # Wall-clock-between-commands (LLM generation latency) is intentionally
+        # excluded so the sandbox budget bounds runaway shell work, not the
+        # outer agent loop.
+        self._cmd_time_used: float = 0.0
         self._env = _build_minimal_env()
 
     # ---- Context manager ----
@@ -134,7 +138,6 @@ class BashSandbox:
             if self.reward_py_source is not None:
                 (self._tasks_dir / "reward.py").write_text(self.reward_py_source)
 
-            self._start_time = time.monotonic()
             return self
         except Exception:
             # Clean up partial tempdir on init failure
@@ -183,10 +186,7 @@ class BashSandbox:
 
     @property
     def time_left(self) -> float:
-        if self._start_time is None:
-            return self.total_timeout_sec
-        elapsed = time.monotonic() - self._start_time
-        return max(0.0, self.total_timeout_sec - elapsed)
+        return max(0.0, self.total_timeout_sec - self._cmd_time_used)
 
     # ---- Bash execution ----
 
@@ -212,6 +212,7 @@ class BashSandbox:
             .replace("/work", str(self._work_dir))
         )
 
+        cmd_start = time.monotonic()
         try:
             result = subprocess.run(
                 ["bash", "-lc", substituted],
@@ -234,6 +235,8 @@ class BashSandbox:
             return ("", f"bash not found: {e}", 127)
         except Exception as e:  # noqa: BLE001 — surface any other error as stderr
             return ("", f"sandbox error: {type(e).__name__}: {e}", 1)
+        finally:
+            self._cmd_time_used += time.monotonic() - cmd_start
 
     # ---- Results ----
 

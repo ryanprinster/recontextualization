@@ -37,6 +37,15 @@ logger = logging.getLogger(__name__)
 # Matches [BASH]...[/BASH] with greedy-but-non-overlapping contents.
 _BASH_BLOCK_RE = re.compile(r"\[BASH\](.*?)\[/BASH\]", re.DOTALL)
 _TERMINATION_RE = re.compile(r"\[(DONE|SUBMIT)\]", re.IGNORECASE)
+_THINK_RE = re.compile(r"<think\b[^>]*>.*?</think>", re.DOTALL | re.IGNORECASE)
+
+
+def _strip_think(text: str) -> str:
+    """Remove reasoning-model <think>...</think> blocks before scanning for
+    control tokens. Reasoning models (R1, Magistral, QwQ) frequently mention
+    [DONE]/[BASH] inside their chain-of-thought while planning, which would
+    otherwise be misread as actual control signals."""
+    return _THINK_RE.sub("", text or "")
 
 
 class DataEntryRolloutGenerator(BaseRolloutGenerator):
@@ -122,41 +131,50 @@ class DataEntryRolloutGenerator(BaseRolloutGenerator):
                     # Append assistant message first
                     slot_messages[idx].append({"role": "assistant", "content": resp})
 
-                    # Termination checks
-                    if _TERMINATION_RE.search(resp) is not None:
-                        slot_active[idx] = False
-                        continue
+                    # Scan for control tokens / tool calls outside of any
+                    # <think>...</think> reasoning block.
+                    visible = _strip_think(resp)
+                    blocks = _BASH_BLOCK_RE.findall(visible)
+                    is_terminating = _TERMINATION_RE.search(visible) is not None
 
-                    blocks = _BASH_BLOCK_RE.findall(resp)
-                    if not blocks:
-                        # No tool calls — treat as implicit stop.
-                        slot_active[idx] = False
-                        continue
-
-                    # Execute sequentially, collect combined tool output.
-                    if sb is None or sb.time_left <= 0:
-                        slot_active[idx] = False
-                        continue
-
-                    outputs: List[str] = []
-                    for j, cmd in enumerate(blocks):
-                        cmd_str = cmd.strip()
-                        stdout, stderr, code = sb.run_bash(cmd_str)
-                        outputs.append(
-                            f"[cmd {j + 1} exit={code}]\n"
-                            f"--- stdout ---\n{stdout}\n"
-                            f"--- stderr ---\n{stderr}"
-                        )
-                        if sb.time_left <= 0:
+                    # Execute any BASH blocks BEFORE honoring [DONE]/[SUBMIT] —
+                    # models routinely emit the final write and the termination
+                    # marker in the same turn (e.g. "[BASH] echo ... [/BASH]
+                    # [DONE]"). Skipping execution would lose the final answer.
+                    if blocks:
+                        if sb is None or sb.time_left <= 0:
                             slot_active[idx] = False
-                            break
+                            continue
 
-                    tool_feedback = "\n\n".join(outputs).rstrip()
-                    if not tool_feedback:
-                        tool_feedback = "[no output]"
-                    slot_messages[idx].append(
-                        {"role": "user", "content": tool_feedback}
-                    )
+                        outputs: List[str] = []
+                        for j, cmd in enumerate(blocks):
+                            cmd_str = cmd.strip()
+                            stdout, stderr, code = sb.run_bash(cmd_str)
+                            outputs.append(
+                                f"[cmd {j + 1} exit={code}]\n"
+                                f"--- stdout ---\n{stdout}\n"
+                                f"--- stderr ---\n{stderr}"
+                            )
+                            if sb.time_left <= 0:
+                                slot_active[idx] = False
+                                break
+
+                        tool_feedback = "\n\n".join(outputs).rstrip()
+                        if not tool_feedback:
+                            tool_feedback = "[no output]"
+                        slot_messages[idx].append(
+                            {"role": "user", "content": tool_feedback}
+                        )
+
+                    if is_terminating:
+                        slot_active[idx] = False
+                        continue
+
+                    if not blocks:
+                        # No tool calls AND no termination marker — treat as
+                        # implicit stop (model has nothing left to do).
+                        slot_active[idx] = False
+                        continue
 
             # Read results for each slot and build Rollouts.
             rollouts_flat: List[Rollout] = []

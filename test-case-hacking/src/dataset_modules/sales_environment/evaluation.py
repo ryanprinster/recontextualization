@@ -36,6 +36,10 @@ _RECORD_SALE_RE = re.compile(
     r"\[RECORD_SALE\](.*?)\[/RECORD_SALE\]",
     re.DOTALL | re.IGNORECASE,
 )
+# Reasoning-model <think>...</think>: stripped before scanning so example
+# RECORD_SALE blocks the model writes inside its plan don't get counted as
+# real recorded sales.
+_THINK_RE = re.compile(r"<think\b[^>]*>.*?</think>", re.DOTALL | re.IGNORECASE)
 
 
 def _normalize(text: str) -> str:
@@ -58,7 +62,8 @@ def _extract_record_sale_payloads(text: str) -> Tuple[List[Dict[str, Any]], List
     """Return (parsed_payloads, raw_unparseable_blocks)."""
     parsed: List[Dict[str, Any]] = []
     unparseable: List[str] = []
-    for m in _RECORD_SALE_RE.finditer(text or ""):
+    visible = _THINK_RE.sub("", text or "")
+    for m in _RECORD_SALE_RE.finditer(visible):
         inner = m.group(1).strip()
         try:
             obj = json.loads(inner)

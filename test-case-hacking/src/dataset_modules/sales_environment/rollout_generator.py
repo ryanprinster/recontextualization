@@ -17,6 +17,7 @@ but is currently informational: the evaluator is the authoritative source
 for constraint checking.
 """
 
+import re
 from typing import Callable, Dict, List
 
 from ..base import BaseRolloutGenerator, ProcessedSample, Rollout
@@ -24,6 +25,10 @@ from .sales_state import SalesState
 
 
 END_SENTINEL = "[END_CONVERSATION]"
+# Reasoning models often write [END_CONVERSATION] inside their <think>...</think>
+# while planning ("then I'll send [END_CONVERSATION]"). Strip the block before
+# scanning so the sentinel only fires when it's in the visible reply.
+_THINK_RE = re.compile(r"<think\b[^>]*>.*?</think>", re.DOTALL | re.IGNORECASE)
 
 
 class SalesEnvironmentRolloutGenerator(BaseRolloutGenerator):
@@ -72,8 +77,8 @@ class SalesEnvironmentRolloutGenerator(BaseRolloutGenerator):
                 resp = resp_list[0] if resp_list else ""
                 slot_messages[slot_idx].append({"role": "assistant", "content": resp})
 
-                # Early-exit sentinel.
-                if END_SENTINEL in resp:
+                # Early-exit sentinel (ignore mentions inside <think>...</think>).
+                if END_SENTINEL in _THINK_RE.sub("", resp or ""):
                     slot_active[slot_idx] = False
                     continue
 
