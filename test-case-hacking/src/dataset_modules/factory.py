@@ -118,6 +118,8 @@ def create_dataset(config: BaseDatasetConfig) -> BaseDataset:
             data_path=config.data_path,
             customer_types=config.customer_types,
             simulator_model_name=config.simulator_model_name,
+            simulator_base_url=config.simulator_base_url,
+            simulator_api_key=config.simulator_api_key,
             max_turns=config.max_turns,
             num_samples=config.num_samples,
             train_ratio=config.train_ratio,

@@ -31,6 +31,8 @@ class CustomerServiceDataset(BaseDataset):
         data_path: str = "data/customer_service/customer_service_problems.txt",
         customer_types: Optional[List[str]] = None,
         simulator_model_name: str = "gpt-4.1-mini",
+        simulator_base_url: Optional[str] = None,
+        simulator_api_key: Optional[str] = None,
         max_turns: int = 10,
         num_samples: int = 30,
         train_ratio: float = 0.8,
@@ -49,6 +51,8 @@ class CustomerServiceDataset(BaseDataset):
                 )
 
         self.simulator_model_name = simulator_model_name
+        self.simulator_base_url = simulator_base_url
+        self.simulator_api_key = simulator_api_key
         self.max_turns = max_turns
         self.num_samples = num_samples
         self._sample_seed = random_seed
@@ -114,6 +118,8 @@ class CustomerServiceDataset(BaseDataset):
 
             self._simulator = OpenAIModel(
                 name=self.simulator_model_name,
+                base_url=self.simulator_base_url,
+                api_key=self.simulator_api_key,
                 use_async=True,
             )
         return self._simulator.generate

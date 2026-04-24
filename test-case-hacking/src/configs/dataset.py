@@ -83,6 +83,8 @@ class CustomerServiceConfig(BaseDatasetConfig):
     data_path: str = "data/customer_service/customer_service_problems.txt"
     customer_types: Optional[List[str]] = None  # None = all 6 personas
     simulator_model_name: str = "gpt-4.1-mini"
+    simulator_base_url: Optional[str] = None
+    simulator_api_key: Optional[str] = None
     max_turns: int = 10
     num_samples: int = 30
     # Initial ProcessedSample is just the bot's system prompt, so filter is off.

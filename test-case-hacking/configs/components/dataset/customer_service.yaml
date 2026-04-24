@@ -8,8 +8,12 @@ data_path: "data/customer_service/customer_service_problems.txt"
 # (friendly, belligerent, distracted, neutral, confused, amateur).
 customer_types: null
 
-# Simulator model (separate OpenAI model used as the "customer").
+# Simulator model (separate OpenAI-compatible model used as the "customer").
 simulator_model_name: "gpt-4.1-mini"
+# Optional: route simulator through a non-default endpoint (e.g. OpenRouter).
+# Both null -> use the default OpenAI endpoint with OPENAI_API_KEY.
+simulator_base_url: null
+simulator_api_key: null
 
 # Max bot turns before the conversation is force-ended.
 max_turns: 10
